@@ -19,7 +19,16 @@ class BotHandler:
 
     async def income_msg(self, request):
         data = await request.json()
-        self.in_message_queue.put_nowait(data)
+        keys = data.keys()
+        income = None
+        if 'callback_query' in keys:
+            income = CallbackQuery.gen(data.get('callback_query'))
+        if 'message' in keys:
+            income = Message.gen(data.get('message'))
+        if income:
+            self.in_message_queue.put_nowait(data)
+        else:
+            print(str(keys))
         return web.Response(status=200)
 
 async def init_app(loop, handler):
@@ -29,11 +38,7 @@ async def init_app(loop, handler):
 
 async def process(in_msg_queue, out_msg_queue):
     while True:
-        data = await in_msg_queue.get()
-        in_msg_queue.task_done()
-        income = Message.gen(data.get('message'))
-        if not income:
-            income = CallbackQuery.gen(data.get('callback_query'))
+        income = await in_msg_queue.get()
         if isinstance(income, Message):
             message = {
                 'chat_id': income.chat.id,
