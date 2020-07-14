@@ -26,7 +26,7 @@ class BotHandler:
         if 'message' in keys:
             income = Message.gen(data.get('message'))
         if income:
-            self.in_message_queue.put_nowait(data)
+            self.in_message_queue.put_nowait(income)
         else:
             print(str(keys))
         return web.Response(status=200)
@@ -42,7 +42,7 @@ async def process(in_msg_queue, out_msg_queue):
         if isinstance(income, Message):
             message = {
                 'chat_id': income.chat.id,
-                'text': income.text,
+                'text': income.from_u.first_name + ' : ' + income.text,
             }
             print(message)
             out_msg_queue.put_nowait(message)
