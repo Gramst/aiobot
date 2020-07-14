@@ -515,7 +515,7 @@ class Message:
         genObj = cls()
         genObj.message_id: int = raw.get('message_id')
         #Unique message identifier inside this chat
-        genObj.from_u: 'User' = User.gen(raw.get('user', {}))
+        genObj.from_u: 'User' = User.gen(raw.get('from', {}))
         #Optional. Sender, empty for messages sent to channels
         genObj.date: int = raw.get('date')
         #Date the message was sent in Unix time
