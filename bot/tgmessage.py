@@ -478,6 +478,10 @@ class InlineKeyboardMarkup:
         return cls()
 
 class Message:
+    message_id: int
+    date: int 
+    chat: 'Chat'
+    
     @classmethod
     def gen(cls, raw):
         if not raw:
@@ -581,3 +585,24 @@ class Message:
         cls.reply_markup: 'InlineKeyboardMarkup' = raw.get('reply_markup')
         #Optional. Inline keyboard attached to the message. login_url buttons are represented as ordinary url buttons.
         return cls
+
+
+class CallbackQuery:
+    @classmethod
+    def gen(cls, raw):
+        if not raw:
+            return None
+        cls.id: str = raw.get('id')
+        #Unique identifier for this query
+        cls.from: 'User' = raw.get('from')
+        #Sender
+        cls.message: 'Message' = raw.get('message')
+        #Optional. Message with the callback button that originated the query. Note that message content and message date will not be available if the message is too old
+        cls.inline_message_id: str = raw.get('inline_message_id')
+        #Optional. Identifier of the message sent via the bot in inline mode, that originated the query.
+        cls.chat_instance: str = raw.get('chat_instance')
+        #Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent. Useful for high scores in games.
+        cls.data: str = raw.get('data')
+        #Optional. Data associated with the callback button. Be aware that a bad client can send arbitrary data in this field.
+        cls.game_short_name: str = raw.get('game_short_name')
+        #Optional. Short name of a Game to be returned, serves as the unique identifier for the game

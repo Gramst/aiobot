@@ -5,7 +5,7 @@ import json
 import ssl
 
 from nonpublic import TOKEN, CRT, KEY
-from bot.tgmessage import Message
+from bot.tgmessage import Message, CallbackQuery
 
 API_URL = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
@@ -27,17 +27,20 @@ async def init_app(loop, handler):
     app.router.add_post(f'/{TOKEN}', handler)
     return app
 
-async def sleep_f(in_msg_queue, out_msg_queue):
+async def process(in_msg_queue, out_msg_queue):
     while True:
         data = await in_msg_queue.get()
         in_msg_queue.task_done()
-        test = Message.gen(data.get('message'))
-        message = {
-            'chat_id': test.chat.id ,#data['message']['chat']['id'],
-            'text': test.text, #data['message']['text']
-        }
-        print(message)
-        out_msg_queue.put_nowait(message)
+        income = Message.gen(data.get('message'))
+        if not income:
+            income = CallbackQuery.gen(data.get('callback_query'))
+        if isinstance(income, Message):
+            message = {
+                'chat_id': income.chat.id,
+                'text': income.text,
+            }
+            print(message)
+            out_msg_queue.put_nowait(message)
         
 
 async def send_f(out_queue):
@@ -60,7 +63,7 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     in_msg_queue = asyncio.Queue()
     out_msg_queue = asyncio.Queue()
-    time_task = loop.create_task(sleep_f(in_msg_queue, out_msg_queue))
+    time_task = loop.create_task(process(in_msg_queue, out_msg_queue))
     send_task = loop.create_task(send_f(out_msg_queue))
     handler = BotHandler(in_msg_queue, out_msg_queue)
     try:
