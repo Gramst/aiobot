@@ -5,3 +5,9 @@ bot/test.py
 *.key
 nonpublic.py
 .vnv
+.vs/aiobot/v16/.suo
+.vs/ProjectSettings.json
+.vs/PythonSettings.json
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+.vscode/settings.json
