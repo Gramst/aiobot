@@ -5,7 +5,7 @@ import json
 import ssl
 
 from nonpublic import TOKEN, CRT, KEY
-from bot.tdmsg_dataclass import Message, CallbackQuery
+from .messages import InMessage
 
 API_URL = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
@@ -19,17 +19,9 @@ class BotHandler:
 
     async def income_msg(self, request):
         data = await request.json()
-        keys = data.keys()
-        income = None
-        if 'callback_query' in keys:
-            income = CallbackQuery.make_from_data(data.get('callback_query'))
-        if 'message' in keys:
-            income = Message.make_from_data(data.get('message'))
-        if income:
-            self.in_message_queue.put_nowait(income)
-            print(income)
-        else:
-            print(str(keys))
+        msg = InMessage(data)
+        if msg.not_empty:
+            self.in_message_queue.put_nowait(msg)
         return web.Response(status=200)
 
 async def init_app(loop, handler):
@@ -40,12 +32,11 @@ async def init_app(loop, handler):
 async def process(in_msg_queue, out_msg_queue):
     while True:
         income = await in_msg_queue.get()
-        if isinstance(income, Message):
+        if income.message:
             message = {
-                'chat_id': income.chat.id,
-                'text': income.from_u.first_name + ' : ' + income.text,
+                'chat_id': income.message.chat.id,
+                'text': income.message.from_u.first_name + ' : ' + income.text,
             }
-            print(message)
             out_msg_queue.put_nowait(message)
         
 
@@ -61,6 +52,7 @@ async def send_f(out_queue):
                                     headers=headers) as resp:
                 try:
                     assert resp.status == 200
+                    return resp.json()
                 except:
                     print('Send not ok')
         print('Send ok')
