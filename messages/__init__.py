@@ -1,4 +1,4 @@
-from .tdmsg_dataclass import Message, CallbackQuery
+from .typestgmessages import Message, CallbackQuery
 
 class InMessage:
     message : Message       = None
@@ -7,10 +7,11 @@ class InMessage:
     def __init__(self, income_json: dict):
         keys = income_json.keys()
         if 'callback_query' in keys:
-            self.callback = CallbackQuery.make_from_data(income_json.get('callback_query'))
+            self.callback = CallbackQuery.make_from_data(data.get('callback_query'))
+            self.message = self.callback.message
             print(self.callback)
-        if 'message' in keys:
-            self.message = Message.make_from_data(income_json.get('message'))
+        elif 'message' in keys:
+            self.message = Message.make_from_data(data.get('message'))
             print(self.message)
 
     @property
