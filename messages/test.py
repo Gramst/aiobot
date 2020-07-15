@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from datamix import FromIncomeData
+from .datamix import FromIncomeData
 
 @dataclass
 class A(FromIncomeData):

@@ -1,6 +1,7 @@
 from typing import List
 
 class FromIncomeData:
+    KEYS = []
 
     @classmethod
     def make_from_data(cls, data: dict) -> 'cls':

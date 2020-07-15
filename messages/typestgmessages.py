@@ -462,3 +462,44 @@ class CallbackQuery(FromIncomeData):
     def __post_init__(self):
         self.from_u : 'User' = User.make_from_data(self.__from_u)
         self.message: 'Message' = Message.make_from_data(self.__message)
+
+@dataclass
+class KeyboardButtonPollType(FromIncomeData):
+    KEYS = ['type']
+    type: str
+
+@dataclass
+class KeyboardButton(FromIncomeData):
+    KEYS = ['text', 'request_contact', 'request_location', 'request_poll']
+    text:str 
+    request_contact: bool 
+    request_location: bool
+    __request_poll: dict = field(repr=False)
+    request_poll: KeyboardButtonPollType = field(init=false)
+
+    def __post_init__(self):
+        self.request_poll = KeyboardButtonPollType.make_from_data(self.__request_poll)
+
+@dataclass
+class ReplyKeyboardMarkup(FromIncomeData):
+    KEYS = ['keyboard','resize_keyboard','one_time_keyboard','selective']
+    __keyboard       : list = field(repr=False)
+    keyboard         : list = field(init=False)
+    resize_keyboard  : bool
+    one_time_keyboard: bool
+    selective        : bool
+
+    def __post_init__(self):
+        self.keyboard = [InlineKeyboardButton.make_list_from_data(i) for i in self.__keyboard]
+
+@dataclass
+class ReplyKeyboardRemove(FromIncomeData):
+    KEYS = ['remove_keyboard', 'selective']
+    remove_keyboard: bool
+    selective: bool
+
+@dataclass
+class ForceReply(FromIncomeData):
+    KEYS = ['force_reply', 'selective']
+    force_reply: bool 
+    selective: bool
