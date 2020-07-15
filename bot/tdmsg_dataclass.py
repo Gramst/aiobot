@@ -1,8 +1,9 @@
 from typing import List
 from dataclasses import dataclass, field
 
-from datamix import FromIncomeData
+from .datamix import FromIncomeData
 
+@dataclass
 class User(FromIncomeData):
     KEYS = ['id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code', 'can_join_groups',
     'can_read_all_group_messages', 'supports_inline_queries']
@@ -16,6 +17,7 @@ class User(FromIncomeData):
     can_read_all_group_messages: bool
     supports_inline_queries    : bool
 
+@dataclass
 class ChatPhoto(FromIncomeData):
     KEYS = ['small_file_id', 'small_file_unique_id', 'big_file_id', 'big_file_unique_id']
     small_file_id       : str
@@ -23,6 +25,7 @@ class ChatPhoto(FromIncomeData):
     big_file_id         : str
     big_file_unique_id  : str
 
+@dataclass
 class ChatPermissions(FromIncomeData):
     KEYS = ['can_send_messages', 'can_send_media_messages', 'can_send_polls', 'can_send_other_messages',
     'can_add_web_page_previews', 'can_change_info', 'can_invite_users', 'can_pin_messages']
@@ -35,6 +38,7 @@ class ChatPermissions(FromIncomeData):
     can_invite_users: bool
     can_pin_messages: bool
 
+@dataclass
 class Chat(FromIncomeData):
     KEYS = ['id', 'type', 'title', 'username', 'first_name', 'last_name', 'photo',
     'description', 'invite_link', 'pinned_message', 'permissions', 'slow_mode_delay',
@@ -58,10 +62,11 @@ class Chat(FromIncomeData):
     can_set_sticker_set: bool
 
     def __post_init__(self):
-        photo: 'ChatPhoto' = ChatPhoto.make_from_data(self.__photo)
-        pinned_message: 'Message' = Message.make_from_data(self.__pinned_message)
-        permissions: 'ChatPermissions' = ChatPermissions.make_from_data(self.__permissions)
+        self.photo: 'ChatPhoto' = ChatPhoto.make_from_data(self.__photo)
+        self.pinned_message: 'Message' = Message.make_from_data(self.__pinned_message)
+        self.permissions: 'ChatPermissions' = ChatPermissions.make_from_data(self.__permissions)
 
+@dataclass
 class MessageEntity(FromIncomeData):
     KEYS = ['type', 'offset', 'length', 'url', 'user', 'language']
     type: str
@@ -70,11 +75,12 @@ class MessageEntity(FromIncomeData):
     url: str
     __user: dict = field(repr=False)
     user: 'User' = field(init=False)
-    language: str = raw.get('language')
+    language: str
 
     def __post_init__(self):
         self.user: 'User' = User.make_from_data(self.__user)
 
+@dataclass
 class PhotoSize(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'width', 'height', 'file_size']
     file_id: str
@@ -85,6 +91,7 @@ class PhotoSize(FromIncomeData):
 
 #TODO data reused class
 
+@dataclass
 class Animation(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'width', 'height', 'duration', 'thumb', 
     'file_name', 'mime_type', 'file_size']
@@ -102,6 +109,7 @@ class Animation(FromIncomeData):
     def __post_init__(self):
         self.thumb: 'PhotoSize' = PhotoSize.make_from_data(self.__thumb)
 
+@dataclass
 class Audio(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'duration', 'performer', 'title', 'mime_type',
     'file_size', 'thumb']
@@ -118,6 +126,7 @@ class Audio(FromIncomeData):
     def __post_init__(self):
         self.thumb: 'PhotoSize' = PhotoSize.make_from_data(self.__thumb)
 
+@dataclass
 class Document(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'thumb', 'file_name', 'mime_type', 'file_size']
     file_id: str
@@ -131,6 +140,7 @@ class Document(FromIncomeData):
     def __post_init__(self):
         self.thumb: 'PhotoSize' = PhotoSize.make_from_data(self.__thumb)
 
+@dataclass
 class MaskPosition(FromIncomeData):
     KEYS = ['point', 'x_shift', 'y_shift', 'scale']
     point: str
@@ -138,6 +148,7 @@ class MaskPosition(FromIncomeData):
     y_shift: float
     scale: float
 
+@dataclass
 class Sticker(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'width', 'height', 'is_animated', 'thumb', 
     'emoji', 'set_name', 'mask_position', 'file_size']
@@ -145,19 +156,20 @@ class Sticker(FromIncomeData):
     file_unique_id: str
     width: int
     height: int
-    is_animated: bool = raw.get('is_animated', False)
+    is_animated: bool
     __thumb: dict = field(repr=False)
     thumb: 'PhotoSize' = field(init=False)
     emoji: str
     set_name: str
-    self.__mask_position: dict = field(repr=False)
+    __mask_position: dict = field(repr=False)
     mask_position: 'MaskPosition' = field(init=False)
-    file_size: int = raw.get('file_size')
+    file_size: int
 
     def __post_init__(self):
         self.thumb: 'PhotoSize' = PhotoSize.make_from_data(self.__thumb)
         self.mask_position: 'MaskPosition' = MaskPosition.make_from_data(self.__mask_position)
 
+@dataclass
 class Video(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'width', 'height', 'duration', 'thumb', 'mime_type', 'file_size']
     file_id: str
@@ -167,12 +179,13 @@ class Video(FromIncomeData):
     duration: int
     __thumb: dict = field(repr=False)
     thumb: 'PhotoSize' = field(init=False)
-    mime_type: str = raw.get('mime_type')
-    file_size: int = raw.get('file_size')
+    mime_type: str
+    file_size: int
 
     def __post_init__(self):
         self.thumb: 'PhotoSize' = PhotoSize.make_from_data(self.__thumb)
 
+@dataclass
 class VideoNote(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'length', 'duration', 'thumb', 'file_size']
     file_id: str
@@ -186,6 +199,7 @@ class VideoNote(FromIncomeData):
     def __post_init__(self):
         self.thumb: 'PhotoSize' = PhotoSize.make_from_data(self.__thumb)
 
+@dataclass
 class Voice(FromIncomeData):
     KEYS = ['file_id', 'file_unique_id', 'duration', 'mime_type', 'file_size']
     file_id: str
@@ -194,6 +208,7 @@ class Voice(FromIncomeData):
     mime_type: str
     file_size: int
 
+@dataclass
 class Contact(FromIncomeData):
     KEYS = ['phone_number', 'first_name', 'last_name', 'user_id', 'vcard']
     phone_number: str
@@ -202,11 +217,13 @@ class Contact(FromIncomeData):
     user_id: int
     vcard: str
 
+@dataclass
 class Dice(FromIncomeData):
     KEYS = ['emoji', 'value']
     emoji: str
     value: int
 
+@dataclass
 class Game(FromIncomeData):
     KEYS = ['title', 'description', 'photo', 'text', 'text_entities', 'animation']
     title: str
@@ -224,11 +241,13 @@ class Game(FromIncomeData):
         self.text_entities: List[MessageEntity] = MessageEntity.make_list_from_data(self.__text_entities)
         self.animation: 'Animation' = Animation.make_from_data(self.__animation)
 
+@dataclass
 class PollOption(FromIncomeData):
     KEYS = ['text','voter_count']
     text: str
     voter_count: int
 
+@dataclass
 class Poll(FromIncomeData):
     KEYS = ['id', 'question', 'options', 'total_voter_count', 'is_closed', 'is_anonymous',
     'type', 'allows_multiple_answers', 'correct_option_id', 'explanation', 'explanation_entities',
@@ -253,11 +272,13 @@ class Poll(FromIncomeData):
         self.options: List[PollOption] = PollOption.make_list_from_data(self.__options)
         self.explanation_entities: List[MessageEntity] = MessageEntity.make_list_from_data(self.__explanation_entities)
 
+@dataclass
 class Location(FromIncomeData):
     KEYS = ['longitude', 'latitude']
     longitude: float
     latitude: float
 
+@dataclass
 class Venue(FromIncomeData):
     KEYS = ['location', 'title', 'address', 'foursquare_id', 'foursquare_type']
     __location     : dict       = field(repr=False)
@@ -270,12 +291,15 @@ class Venue(FromIncomeData):
     def __post_init__(self):
         location: 'Location' = Location.make_from_data(self.__location)
 
+@dataclass
 class SuccessfulPayment(FromIncomeData):
     pass
 
+@dataclass
 class PassportData(FromIncomeData):
     pass
 
+@dataclass
 class LoginUrl(FromIncomeData):
     KEYS = ['url', 'forward_text', 'bot_username', 'request_write_access']
     url: str
@@ -283,6 +307,7 @@ class LoginUrl(FromIncomeData):
     bot_username: str
     request_write_access: bool
 
+@dataclass
 class InlineKeyboardButton(FromIncomeData):
     KEYS = ['text', 'url', 'login_url', 'callback_data', 'switch_inline_query',
     'switch_inline_query_current_chat', 'pay']
@@ -299,6 +324,7 @@ class InlineKeyboardButton(FromIncomeData):
     def __post_init__(self):
         self.login_url: 'LoginUrl' = LoginUrl.make_from_data(self.__login_url)
 
+@dataclass
 class InlineKeyboardMarkup(FromIncomeData):
     __inline_keyboard: list = field(repr=False)
     inline_keyboard  : list = field(init=False)
@@ -415,8 +441,8 @@ class Message(FromIncomeData):
         self.location                : 'Location' = Location.make_from_data(self.__location)
         self.new_chat_members        : List[User] = User.make_list_from_data(self.__new_chat_members)
         self.left_chat_member        : 'User' = User.make_from_data(self.__left_chat_member)
-        self.new_chat_photo          : List[PhotoSize] = PhotoSize.make_list_from_data(self.__new_chat_photo)
-        self.pinned_message          : 'Message' Message.make_from_data(self.__pinned_message)
+        self.new_chat_photo          : List[PhotoSize] = PhotoSize.make_list_from_data(self.__newchat_photo)
+        self.pinned_message          : 'Message' = Message.make_from_data(self.__pinned_message)
         self.reply_markup            : 'InlineKeyboardMarkup' = InlineKeyboardMarkup.make_list_from_data(self.__reply_markup)
 
 @dataclass
@@ -435,4 +461,4 @@ class CallbackQuery(FromIncomeData):
 
     def __post_init__(self):
         self.from_u : 'User' = User.make_from_data(self.__from_u)
-        self.message: 'Message' Message.make_from_data(self.__message)
+        self.message: 'Message' = Message.make_from_data(self.__message)

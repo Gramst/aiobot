@@ -7,6 +7,7 @@ class FromIncomeData:
         if data and cls.KEYS:
             _ = [data.get(i) for i in cls.KEYS]
             return cls(*_)
+        return None
 
     @classmethod
     def make_list_from_data(cls, data: list) -> List['cls']:

@@ -5,7 +5,7 @@ import json
 import ssl
 
 from nonpublic import TOKEN, CRT, KEY
-from bot.tgmessage import Message, CallbackQuery
+from bot.tdmsg_dataclass import Message, CallbackQuery
 
 API_URL = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
@@ -22,11 +22,12 @@ class BotHandler:
         keys = data.keys()
         income = None
         if 'callback_query' in keys:
-            income = CallbackQuery.gen(data.get('callback_query'))
+            income = CallbackQuery.make_from_data(data.get('callback_query'))
         if 'message' in keys:
-            income = Message.gen(data.get('message'))
+            income = Message.make_from_data(data.get('message'))
         if income:
             self.in_message_queue.put_nowait(income)
+            print(income)
         else:
             print(str(keys))
         return web.Response(status=200)

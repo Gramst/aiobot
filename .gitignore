@@ -1,1 +1,7 @@
 bot/test.py
+*.pyc
+*.swp
+*.crt
+*.key
+nonpublic.py
+.vnv
