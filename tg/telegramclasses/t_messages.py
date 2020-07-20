@@ -1,7 +1,7 @@
 from typing import List
 from dataclasses import dataclass, field
 
-from .datamix import FromIncomeData
+from .mix_messages import FromIncomeData
 
 @dataclass
 class User(FromIncomeData):
@@ -29,14 +29,14 @@ class ChatPhoto(FromIncomeData):
 class ChatPermissions(FromIncomeData):
     KEYS = ['can_send_messages', 'can_send_media_messages', 'can_send_polls', 'can_send_other_messages',
     'can_add_web_page_previews', 'can_change_info', 'can_invite_users', 'can_pin_messages']
-    can_send_messages: bool
-    can_send_media_messages: bool
-    can_send_polls: bool
-    can_send_other_messages: bool
+    can_send_messages        : bool
+    can_send_media_messages  : bool
+    can_send_polls           : bool
+    can_send_other_messages  : bool
     can_add_web_page_previews: bool
-    can_change_info: bool
-    can_invite_users: bool
-    can_pin_messages: bool
+    can_change_info          : bool
+    can_invite_users         : bool
+    can_pin_messages         : bool
 
 @dataclass
 class Chat(FromIncomeData):

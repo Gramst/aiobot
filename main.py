@@ -5,7 +5,7 @@ import json
 import ssl
 
 from nonpublic import TOKEN, CRT, KEY
-from messages import InMessage
+from tg.messages import InMessage
 
 API_URL = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
