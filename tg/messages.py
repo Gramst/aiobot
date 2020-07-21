@@ -17,7 +17,6 @@ class InMessage:
             print(self.callback)
         elif 'message' in keys:
             self.message = Message.make_from_data(income_json.get('message'))
-            print(self.message)
 
     @property
     def not_empty(self) -> bool:
@@ -25,17 +24,10 @@ class InMessage:
             return True
         return False
 
-# @dataclass(init=False)
 class OutMessage:
-    # method          : Union[sendMessage, ]
-    # from_id         : int
-    # from_message_id : int
-    # text            : str
-    # file_id         : List[str]
 
     def __init__(self, data):
-        self.sm = sendMessage
-        self.sm.API_URL = data
+        sendMessage.API_URL = data
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
@@ -56,10 +48,3 @@ class OutMessage:
         # if other.message.sticker:
         #     self.method  = sendMessage
         #     self.file_id = other.message.sticker.file_id
-
-    async def send_to(self):
-        res = await self.method.do_request()
-        return res
-        
-
-            

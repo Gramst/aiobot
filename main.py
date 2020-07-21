@@ -36,8 +36,7 @@ async def process(in_msg_queue, out_msg_queue):
         if income.message:
             out = OutMessage(API_URL)
             out << income
-            res = await out.send_to()
-            print(str(res))
+            print(await out.method.do_request())
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()

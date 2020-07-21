@@ -16,4 +16,6 @@ class AIODoRequest:
             async with session.post(self.API_URL,
                                     data=json.dumps(self.get_data()),
                                     headers=headers) as resp:
-                return resp.json()
+                res = await resp.text()
+                print(res)
+                return res
