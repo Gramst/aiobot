@@ -475,7 +475,7 @@ class KeyboardButton(FromIncomeData):
     request_contact: bool 
     request_location: bool
     __request_poll: dict = field(repr=False)
-    request_poll: KeyboardButtonPollType = field(init=false)
+    request_poll: KeyboardButtonPollType = field(init=False)
 
     def __post_init__(self):
         self.request_poll = KeyboardButtonPollType.make_from_data(self.__request_poll)

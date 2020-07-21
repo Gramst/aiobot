@@ -33,8 +33,9 @@ class OutMessage:
     # text            : str
     # file_id         : List[str]
 
-    def __init__(self):
-        pass
+    def __init__(self, data):
+        self.sm = sendMessage
+        self.sm.API_URL = data
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
@@ -57,7 +58,8 @@ class OutMessage:
         #     self.file_id = other.message.sticker.file_id
 
     async def send_to(self):
-        await self.method.do_request()
+        res = await self.method.do_request()
+        return res
         
 
             

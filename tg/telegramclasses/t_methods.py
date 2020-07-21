@@ -1,5 +1,5 @@
 from typing import Union
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 
 from .t_messages import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
 from .mix_methods import AIODoRequest
@@ -12,7 +12,7 @@ class baseChatSettings:
     disable_notification    : bool = False
 
     def get(self) -> dict:
-        res: dict = self.asdict()
+        res: dict = asdict(self)
         if self.parse_mode not in ['html', 'markdown']:
             res.pop('parse_mode')
         if not self.disable_web_page_preview:
@@ -23,6 +23,7 @@ class baseChatSettings:
 
 @dataclass
 class sendMessage(AIODoRequest):
+    API_URL = ''
     text                    : str
     chat_settings           : baseChatSettings = None
     reply_to_message_id     : int              = None

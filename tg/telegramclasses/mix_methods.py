@@ -16,9 +16,4 @@ class AIODoRequest:
             async with session.post(self.API_URL,
                                     data=json.dumps(self.get_data()),
                                     headers=headers) as resp:
-                try:
-                    assert resp.status == 200
-                    return resp.json()
-                except:
-                    print('Send not ok')
-                    return {}
+                return resp.json()

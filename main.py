@@ -34,40 +34,16 @@ async def process(in_msg_queue, out_msg_queue):
     while True:
         income = await in_msg_queue.get()
         if income.message:
-            out = OutMessage()
+            out = OutMessage(API_URL)
             out << income
             res = await out.send_to()
-            print(res)
-            # message = {
-            #     'chat_id': income.message.chat.id,
-            #     'text': income.message.from_u.first_name + ' : ' + income.message.text,
-            # }
-            # out_msg_queue.put_nowait(message)
-        
-
-async def send_f(out_queue):
-    while True:
-        message = await out_queue.get()
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        async with aiohttp.ClientSession(loop=loop) as session:
-            async with session.post(API_URL,
-                                    data=json.dumps(message),
-                                    headers=headers) as resp:
-                try:
-                    assert resp.status == 200
-                    #return resp.json()
-                except:
-                    print('Send not ok')
-        print('Send ok')
+            print(str(res))
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     in_msg_queue = asyncio.Queue()
     out_msg_queue = asyncio.Queue()
     time_task = loop.create_task(process(in_msg_queue, out_msg_queue))
-    send_task = loop.create_task(send_f(out_msg_queue))
     handler = BotHandler(in_msg_queue, out_msg_queue)
     try:
         app = loop.run_until_complete(init_app(loop, handler.income_msg))
