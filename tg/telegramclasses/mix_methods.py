@@ -21,4 +21,4 @@ class AIODoRequest:
                     return resp.json()
                 except:
                     print('Send not ok')
-                    return None
+                    return {}

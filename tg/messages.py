@@ -25,13 +25,13 @@ class InMessage:
             return True
         return False
 
-@dataclass(init=False)
+# @dataclass(init=False)
 class OutMessage:
-    method          : Union[sendMessage, ]
-    from_id         : int
-    from_message_id : int
-    text            : str
-    file_id         : List[str]
+    # method          : Union[sendMessage, ]
+    # from_id         : int
+    # from_message_id : int
+    # text            : str
+    # file_id         : List[str]
 
     def __init__(self):
         pass
@@ -56,7 +56,8 @@ class OutMessage:
         #     self.method  = sendMessage
         #     self.file_id = other.message.sticker.file_id
 
-    async def send_to(self, user):
+    async def send_to(self):
         await self.method.do_request()
+        
 
             

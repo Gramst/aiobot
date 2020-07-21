@@ -5,9 +5,10 @@ import json
 import ssl
 
 from nonpublic import TOKEN, CRT, KEY
-from tg.messages import InMessage
+from tg.messages import InMessage, OutMessage
 
 API_URL = f'https://api.telegram.org/bot{TOKEN}/sendMessage'
+
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 sslcontext.load_cert_chain(CRT,keyfile=KEY)
 
@@ -33,11 +34,15 @@ async def process(in_msg_queue, out_msg_queue):
     while True:
         income = await in_msg_queue.get()
         if income.message:
-            message = {
-                'chat_id': income.message.chat.id,
-                'text': income.message.from_u.first_name + ' : ' + income.message.text,
-            }
-            out_msg_queue.put_nowait(message)
+            out = OutMessage()
+            out << income
+            res = await out.send_to()
+            print(res)
+            # message = {
+            #     'chat_id': income.message.chat.id,
+            #     'text': income.message.from_u.first_name + ' : ' + income.message.text,
+            # }
+            # out_msg_queue.put_nowait(message)
         
 
 async def send_f(out_queue):
