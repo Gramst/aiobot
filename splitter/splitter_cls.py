@@ -21,7 +21,12 @@ class Splitter:
             if income.message:
                 out = OutMessage()
                 out << income
-                json_result = await out.method.do_request(self.base_url)
-                r_msg = ResponseMessage(json_result)
-                if r_msg.ok:
-                    print(r_msg.result)
+                r_msg = await out.send_to_server(self.base_url)
+                if r_msg:
+                    print(
+                        r_msg.from_id,
+                        r_msg.from_message_id,
+                        r_msg.result.chat.id,
+                        r_msg.result.message_id,
+                        r_msg.result.date
+                        )

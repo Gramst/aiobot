@@ -25,8 +25,10 @@ class InMessage:
         return False
 
 class ResponseMessage:
-    ok    : bool = False
-    result: Message = None
+    from_id        : int
+    from_message_id: int
+    ok             : bool    = False
+    result         : Message = None
 
     def __init__(self, income_json: dict):
         self.ok = income_json.get('ok', False)
@@ -53,3 +55,11 @@ class OutMessage:
         # if other.message.sticker:
         #     self.method  = sendMessage
         #     self.file_id = other.message.sticker.file_id
+
+    async def send_to_server(self, base_url: str) -> ResponseMessage:
+        res = ResponseMessage(await self.method.do_request(base_url))
+        if res.ok:
+            res.from_id         = self.from_id
+            res.from_message_id = self.from_message_id
+            return res
+        return None
