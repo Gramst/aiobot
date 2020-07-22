@@ -17,5 +17,4 @@ class AIODoRequest:
                                     data=json.dumps(self.get_data()),
                                     headers=headers) as resp:
                 res = await resp.json()
-                print(res)
                 return res
