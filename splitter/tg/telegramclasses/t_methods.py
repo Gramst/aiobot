@@ -23,12 +23,11 @@ class baseChatSettings:
 
 @dataclass
 class sendMessage(AIODoRequest):
-    API_URL = ''
+    tg_method_name = 'sendMessage'
     text                    : str
     chat_settings           : baseChatSettings = None
     reply_to_message_id     : int              = None
     reply_markup            : Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply] = None
-
 
     def get_data(self) -> dict:
         res = self.chat_settings.get()

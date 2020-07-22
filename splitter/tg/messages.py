@@ -24,15 +24,12 @@ class InMessage:
             return True
         return False
 
-class OutMessage:
 
-    def __init__(self, data):
-        sendMessage.API_URL = data
+class OutMessage:
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
             return
-
         self.from_id = other.message.from_u.id
         self.from_message_id = other.message.message_id
         if other.message.text:
