@@ -24,6 +24,14 @@ class InMessage:
             return True
         return False
 
+class ResponseMessage:
+    ok    : bool = False
+    result: Message = None
+
+    def __init__(self, income_json: dict):
+        self.ok = income_json.get('ok', False)
+        if self.ok:
+            self.result = Message.make_from_data(income_json.get('result'))
 
 class OutMessage:
 

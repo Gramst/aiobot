@@ -21,7 +21,6 @@ async def init_app(loop, bot: Splitter):
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     time_task = loop.create_task(bot.process())
-    handler = BotHandler(in_msg_queue, out_msg_queue)
     try:
         app = loop.run_until_complete(init_app(loop, bot))
         web.run_app(app, host='0.0.0.0', port=8443, ssl_context=sslcontext)

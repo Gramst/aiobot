@@ -1,1 +1,1 @@
-from .messages import InMessage, OutMessage
+from .messages import InMessage, OutMessage, ResponseMessage

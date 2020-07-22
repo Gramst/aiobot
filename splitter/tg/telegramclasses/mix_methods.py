@@ -16,6 +16,6 @@ class AIODoRequest:
             async with session.post(base_url + self.tg_method_name,
                                     data=json.dumps(self.get_data()),
                                     headers=headers) as resp:
-                res = await resp.text()
+                res = await resp.json()
                 print(res)
                 return res

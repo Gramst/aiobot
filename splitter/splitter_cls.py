@@ -1,4 +1,4 @@
-from .tg import InMessage, OutMessage
+from .tg import InMessage, OutMessage, ResponseMessage
 
 from aiohttp import web
 import asyncio 
@@ -21,4 +21,7 @@ class Splitter:
             if income.message:
                 out = OutMessage()
                 out << income
-                print(await out.method.do_request(self.base_url))
+                json_result = await out.method.do_request(self.base_url)
+                r_msg = ResponseMessage(json_result)
+                if r_msg.ok:
+                    print(r_msg.result)
