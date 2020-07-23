@@ -5,7 +5,7 @@ from dataclasses import asdict, astuple
 
 class DataToSerialise:
 
-    def get_data(self):
+    def get_data(self) -> dict:
         _ = asdict(self)
         return {k: v for k, v in _.items() if v}
 
