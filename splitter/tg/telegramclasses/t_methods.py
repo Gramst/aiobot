@@ -35,11 +35,21 @@ class sendMessage(AIODoRequest):
 
 @dataclass
 class sendPhoto(AIODoRequest):
-    chat_id                 : int
-    photo                   : str
-    caption                 : str
-    parse_mode              : str  = 'html'
-    disable_web_page_preview: bool = False
-    disable_notification    : bool = False
-    reply_to_message_id     : int = None
+    chat_id             : int
+    photo               : str
+    caption             : str  = ''
+    parse_mode          : str  = 'html'
+    disable_notification: bool = False
+    reply_to_message_id : int  = None
     reply_markup : Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply] = None
+
+@dataclass
+class sendAudio(AIODoRequest):
+    chat_id   : int
+    audio     : str
+    caption   : str = ''
+    parse_mode: str = 'html'
+    duration  : int = 0
+    performer : str = ''
+    title     : str = ''
+    thumb     : str = ''
