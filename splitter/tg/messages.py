@@ -46,11 +46,9 @@ class OutMessage:
             self.method  = sendMessage( other.message.from_u.id,
                                         other.message.text)
         if other.message.photo:
-            self.text    = other.message.caption
-            if len(other.message.photo) == 1:
-                self.method  = sendPhoto(   other.message.from_u.id,
-                                            other.message.photo[0].file_id,
-                                            other.message.caption)
+            self.method  = sendPhoto(   other.message.from_u.id,
+                                        other.message.photo[0].file_id,
+                                        other.message.caption)
         # if other.message.audio:
         #     self.method  = sendMessage
         #     self.text    = other.message.caption
