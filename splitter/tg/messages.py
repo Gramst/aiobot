@@ -3,7 +3,7 @@ from typing import List, Union
 import asyncio
 
 from .telegramclasses.t_messages import Message, CallbackQuery
-from .telegramclasses.t_methods import sendMessage, baseChatSettings
+from .telegramclasses.t_methods import sendMessage, sendPhoto
 
 class InMessage:
     message : Message       = None
@@ -43,11 +43,14 @@ class OutMessage:
         self.from_id = other.message.from_u.id
         self.from_message_id = other.message.message_id
         if other.message.text:
-            self.method  = sendMessage(other.message.from_u.id, other.message.text)
-        # if other.message.photo:
-        #     self.method  = sendMessage
-        #     self.text    = other.message.caption
-        #     self.file_id = [i.file_id for i in other.message.photo]
+            self.method  = sendMessage( other.message.from_u.id,
+                                        other.message.text)
+        if other.message.photo:
+            self.text    = other.message.caption
+            if len(other.message.photo) == 1:
+                self.method  = sendPhoto(   other.message.from_u.id,
+                                            other.message.photo[0].file_id,
+                                            other.message.caption)
         # if other.message.audio:
         #     self.method  = sendMessage
         #     self.text    = other.message.caption

@@ -2,7 +2,7 @@ from typing import Union
 from dataclasses import dataclass, field, asdict
 
 from .t_messages import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
-from .mix_methods import AIODoRequest, DataToSerialise
+from .mix_methods import AIODoRequest
 
 @dataclass
 class baseChatSettings:
@@ -23,7 +23,7 @@ class baseChatSettings:
         return(res)
 
 @dataclass
-class sendMessage(AIODoRequest, DataToSerialise):
+class sendMessage(AIODoRequest):
     chat_id                 : int
     text                    : str
     parse_mode              : str  = 'html'
@@ -34,7 +34,8 @@ class sendMessage(AIODoRequest, DataToSerialise):
 
 
 @dataclass
-class sendPhoto(AIODoRequest, DataToSerialise):
+class sendPhoto(AIODoRequest):
+    chat_id                 : int
     photo                   : str
     caption                 : str
     parse_mode              : str  = 'html'

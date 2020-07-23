@@ -3,8 +3,14 @@ import json
 from aiohttp import ClientSession
 from dataclasses import asdict, astuple
 
+class DataToSerialise:
 
-class AIODoRequest:
+    def get_data(self):
+        _ = asdict(self)
+        return {k: v for k, v in _.items() if v}
+
+
+class AIODoRequest(DataToSerialise):
 
     async def do_request(self, base_url) -> dict:
         headers = {
@@ -16,11 +22,3 @@ class AIODoRequest:
                                     headers=headers) as resp:
                 res = await resp.json()
                 return res
-
-class DataToSerialise:
-
-    def get_data(self):
-        _ = asdict(self)
-        print(_)
-        return {k: v for k, v in _.items() if v}
-
