@@ -11,3 +11,5 @@ nonpublic.py
 .vs/slnx.sqlite
 .vs/VSWorkspaceState.json
 .vscode/settings.json
+brati*
+*.db
