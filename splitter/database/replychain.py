@@ -1,6 +1,7 @@
 import sqlite3
 import aiosqlite
 import os
+import asyncio
 
 class ReplyChain:
 
@@ -22,3 +23,8 @@ class ReplyChain:
             (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)''')
         conn.commit()
         conn.close()
+
+    async def add_data(self, from_tid: int, from_mid: int, to_tid: int, to_mid: int, time: int):
+        async with aiosqlite.connect(self.path + self.base_name) as db:
+            await db.execute("INSERT INTO stocks VALUES (?,?,?,?,?)", (from_tid, from_mid, to_tid, to_mid, time))
+            await db.commit()

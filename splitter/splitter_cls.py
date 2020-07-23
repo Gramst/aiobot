@@ -32,3 +32,10 @@ class Splitter:
                         r_msg.result.message_id,
                         r_msg.result.date
                         )
+                    self.reply_chain.add_data(
+                        r_msg.from_id,
+                        r_msg.from_message_id,
+                        r_msg.result.chat.id,
+                        r_msg.result.message_id,
+                        r_msg.result.date
+                        )
