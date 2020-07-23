@@ -23,7 +23,7 @@ class baseChatSettings:
         return(res)
 
 @dataclass
-class sendMessage(AIODoRequest):
+class sendMessage(AIODoRequest, DataToSerialise):
     chat_id                 : int
     text                    : str
     parse_mode              : str  = 'html'
@@ -34,7 +34,7 @@ class sendMessage(AIODoRequest):
 
 
 @dataclass
-class sendPhoto(AIODoRequest):
+class sendPhoto(AIODoRequest, DataToSerialise):
     photo                   : str
     caption                 : str
     parse_mode              : str  = 'html'
