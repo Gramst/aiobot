@@ -43,7 +43,7 @@ class OutMessage:
         self.from_id = other.message.from_u.id
         self.from_message_id = other.message.message_id
         if other.message.text:
-            self.method  = sendMessage(other.message.text, baseChatSettings(other.message.from_u.id))
+            self.method  = sendMessage(other.message.from_u.id, other.message.text)
         # if other.message.photo:
         #     self.method  = sendMessage
         #     self.text    = other.message.caption

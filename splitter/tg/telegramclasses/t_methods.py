@@ -2,7 +2,7 @@ from typing import Union
 from dataclasses import dataclass, field, asdict
 
 from .t_messages import InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply
-from .mix_methods import AIODoRequest
+from .mix_methods import AIODoRequest, DataToSerialise
 
 @dataclass
 class baseChatSettings:

@@ -5,9 +5,6 @@ from dataclasses import asdict, astuple
 
 
 class AIODoRequest:
-    
-    def get_data(self):
-        raise NotImplementedError
 
     async def do_request(self, base_url) -> dict:
         headers = {
@@ -23,6 +20,7 @@ class AIODoRequest:
 class DataToSerialise:
 
     def get_data(self):
-        _ = astuple(self)
-        return dict([ i for i in _ if i])
+        _ = asdict(self)
+        print(_)
+        return {k: v for k, v in _.items() if v}
 
