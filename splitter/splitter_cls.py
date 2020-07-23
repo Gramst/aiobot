@@ -1,14 +1,16 @@
 from .tg import InMessage, OutMessage, ResponseMessage
+from .database import ReplyChain
 
 from aiohttp import web
 import asyncio 
 
 class Splitter:
 
-    def __init__(self, token: str):
+    def __init__(self, token: str, bases_path: str):
         self.token = token
         self.base_url: str = f'https://api.telegram.org/bot{self.token}/'
         self.in_queue = asyncio.Queue()
+        self.reply_chain = ReplyChain(bases_path, 'reply.db')
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()

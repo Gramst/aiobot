@@ -11,7 +11,7 @@ from splitter import Splitter
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 sslcontext.load_cert_chain(CRT,keyfile=KEY)
 
-bot = Splitter(TOKEN)
+bot = Splitter(TOKEN, 'bratishkabot/')
 
 async def init_app(loop, bot: Splitter):
     app = web.Application(loop=loop)

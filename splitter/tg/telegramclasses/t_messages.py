@@ -289,7 +289,7 @@ class Venue(FromIncomeData):
     foursquare_type: str
 
     def __post_init__(self):
-        location: 'Location' = Location.make_from_data(self.__location)
+        self.location: 'Location' = Location.make_from_data(self.__location)
 
 @dataclass
 class SuccessfulPayment(FromIncomeData):
