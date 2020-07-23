@@ -10,6 +10,7 @@ class baseChatSettings:
     parse_mode              : str  = 'html'
     disable_web_page_preview: bool = False
     disable_notification    : bool = False
+    
 
     def get(self) -> dict:
         res: dict = asdict(self)
@@ -23,19 +24,21 @@ class baseChatSettings:
 
 @dataclass
 class sendMessage(AIODoRequest):
-    tg_method_name = 'sendMessage'
+    chat_id                 : int
     text                    : str
-    chat_settings           : baseChatSettings = None
-    reply_to_message_id     : int              = None
+    parse_mode              : str  = 'html'
+    disable_web_page_preview: bool = False
+    disable_notification    : bool = False
+    reply_to_message_id     : int  = None
     reply_markup            : Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply] = None
 
-    def get_data(self) -> dict:
-        res = self.chat_settings.get()
-        res['text'] = self.text
-        if self.reply_to_message_id:
-            res['reply_to_message_id'] = self.reply_to_message_id
-        if self.reply_markup:
-            res['reply_markup'] = self.reply_markup
-        return res
 
-
+@dataclass
+class sendPhoto(AIODoRequest):
+    photo                   : str
+    caption                 : str
+    parse_mode              : str  = 'html'
+    disable_web_page_preview: bool = False
+    disable_notification    : bool = False
+    reply_to_message_id     : int = None
+    reply_markup : Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply] = None

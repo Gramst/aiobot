@@ -1,9 +1,10 @@
 import asyncio
 import json
 from aiohttp import ClientSession
+from dataclasses import asdict
+
 
 class AIODoRequest:
-    tg_method_name = ''
     
     def get_data(self):
         raise NotImplementedError
@@ -13,8 +14,8 @@ class AIODoRequest:
             'Content-Type': 'application/json'
         }
         async with ClientSession() as session:
-            async with session.post(base_url + self.tg_method_name,
-                                    data=json.dumps(self.get_data()),
+            async with session.post(base_url + self.__class__.__name__,
+                                    data=json.dumps(asdict(self)),
                                     headers=headers) as resp:
                 res = await resp.json()
                 return res
