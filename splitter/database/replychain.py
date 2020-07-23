@@ -8,7 +8,7 @@ class ReplyChain:
         self.path = path
         self.base_name = base_name
         if not os.path.isfile(self.path + self.base_name):
-            with open(self.path + self.base_name, 'w') as f:
+            with open(self.path + self.base_name, 'w+') as f:
                 pass
         self.make_db_table()
         
