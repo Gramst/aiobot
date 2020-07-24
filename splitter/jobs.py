@@ -4,6 +4,10 @@ class Job:
     ticker: int
     current_tick: int
 
+    def __init__(self, ticker_value):
+        self.ticker = ticker_value
+        self.current_tick = 0
+
     def update_timer(self):
         self.current_tick += 1
 
@@ -16,8 +20,7 @@ class Job:
             return False
 
     @classmethod
-    def get_job(cls, function, ticker_value: int) -> Job:
-        res = cls()
-        res.current_tick = 0
+    def get_job(cls, function, ticker_value: int) -> 'Job':
+        res = cls(ticker_value)
         res.run = function
         return res

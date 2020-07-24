@@ -51,6 +51,6 @@ class ReplyChain:
     async def clear_old(self):
         sql = 'DELETE FROM stocks WHERE time BETWEEN 0 and ?'
         async with aiosqlite.connect(self.path + self.base_name) as db:
-            await db.execute(sql, (int(datetime.timestamp(datetime.now()))))
+            current_ts = int(datetime.timestamp(datetime.now())) - 60
+            await db.execute(sql, (current_ts,))
             await db.commit()
-            #(int(datetime.timestamp(datetime.now())))

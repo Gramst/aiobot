@@ -8,7 +8,6 @@ from .jobs import Job
 
 class Splitter:
     jobs: list
-    tick_time: 5
 
     def __init__(self, token: str, bases_path: str):
         self.jobs = []
@@ -16,7 +15,7 @@ class Splitter:
         self.base_url: str = f'https://api.telegram.org/bot{self.token}/'
         self.in_queue = asyncio.Queue()
         self.reply_chain = ReplyChain(bases_path, 'reply.db')
-        self.jobs.append(Job.get_job(self.reply_chain.clear_old(), 30))
+        self.jobs.append(Job.get_job(self.reply_chain.clear_old, 1))
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
@@ -24,13 +23,14 @@ class Splitter:
         return web.Response(status=200)
 
     async def kronos(self):
-        print('run')
-        [i.update_timer() for i in self.jobs]
-        _ = [i for i in self.jobs if i.is_ready]
-        for job in _:
-            await job.run()
-        print('sleep')
-        await asyncio.sleep(self.tick_time)
+        while True:
+            print('run')
+            [i.update_timer() for i in self.jobs]
+            _ = [i for i in self.jobs if i.is_ready]
+            for job in _:
+                await job.run()
+            print('sleep')
+            await asyncio.sleep(5)
 
     async def process(self):
         while True:
