@@ -19,8 +19,12 @@ class ReplyChain:
     def make_db_table(self):
         conn = sqlite3.connect(self.path + self.base_name)
         c = conn.cursor()
-        c.execute('''CREATE TABLE stocks
-            (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)''')
+        c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='stocks' ''')
+        if c.fetchone()[0]==1:
+            pass
+        else:
+            c.execute('''CREATE TABLE stocks
+                (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)''')
         conn.commit()
         conn.close()
 
@@ -28,3 +32,17 @@ class ReplyChain:
         async with aiosqlite.connect(self.path + self.base_name) as db:
             await db.execute("INSERT INTO stocks VALUES (?,?,?,?,?)", (from_tid, from_mid, to_tid, to_mid, time))
             await db.commit()
+
+
+    async def get_reply(self, reply_to_message_id: int) -> list:
+        res = []
+        async with aiosqlite.connect(self.path + self.base_name) as db:
+            sql = "SELECT * FROM stocks WHERE toMID=?"
+            await db.execute(sql, [(reply_to_message_id)])
+            _ = await db.fetchone()
+            if _:
+                sql = "SELECT * FROM stocks WHERE fromMID=?"
+                await db.execute(sql, [(_[1])])
+                res = await db.fetchmany()
+        return res
+
