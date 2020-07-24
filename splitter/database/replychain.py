@@ -47,3 +47,9 @@ class ReplyChain:
                     res = await cursor.fetchmany()
         return res
 
+    async def clear_old(self, timestamp_oldest: int):
+        sql = 'DELETE FROM stocks WHERE time BETWEEN 0 and ?'
+        async with aiosqlite.connect(self.path + self.base_name) as db:
+            await db.execute(sql, (timestamp_oldest))
+            await db.commit()
+            #(int(datetime.timestamp(datetime.now())))

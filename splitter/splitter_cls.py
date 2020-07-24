@@ -32,7 +32,8 @@ class Splitter:
                         r_msg.from_message_id,
                         r_msg.result.chat.id,
                         r_msg.result.message_id,
-                        r_msg.result.date
+                        r_msg.result.date,
+                        r_msg.result.date - int(datetime.timestamp(datetime.now()))
                         )
                     await self.reply_chain.add_data(
                         r_msg.from_id,
