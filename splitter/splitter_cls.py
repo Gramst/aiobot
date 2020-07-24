@@ -22,6 +22,8 @@ class Splitter:
             income = await self.in_queue.get()
             if income.message:
                 out = OutMessage()
+                if income.message.reply_to_message:
+                    print(await self.reply_chain.get_reply(income.message.reply_to_message.message_id))
                 out << income
                 r_msg = await out.send_to_server(self.base_url)
                 if r_msg:

@@ -37,12 +37,13 @@ class ReplyChain:
     async def get_reply(self, reply_to_message_id: int) -> list:
         res = []
         async with aiosqlite.connect(self.path + self.base_name) as db:
+            _ = []
             sql = "SELECT * FROM stocks WHERE toMID=?"
-            await db.execute(sql, [(reply_to_message_id)])
-            _ = await db.fetchone()
+            async with db.execute(sql, [(reply_to_message_id)]) as cursor:
+                _ = await cursor.fetchone()
             if _:
                 sql = "SELECT * FROM stocks WHERE fromMID=?"
-                await db.execute(sql, [(_[1])])
-                res = await db.fetchmany()
+                async with db.execute(sql, [(_[1])]) as cursor:
+                    res = await cursor.fetchmany()
         return res
 
