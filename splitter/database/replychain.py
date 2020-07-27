@@ -6,9 +6,10 @@ from datetime import datetime
 
 class ReplyChain:
 
-    def __init__(self, path, base_name):
+    def __init__(self, path: str, base_name: str, time_to_clean_messages: int):
         self.path = path
         self.base_name = base_name
+        self.time_to_clean_messages = time_to_clean_messages
         if not os.path.isdir(self.path):
             os.mkdir(self.path)
         if not os.path.isfile(self.path + self.base_name):
@@ -51,6 +52,6 @@ class ReplyChain:
     async def clear_old(self):
         sql = 'DELETE FROM stocks WHERE time BETWEEN 0 and ?'
         async with aiosqlite.connect(self.path + self.base_name) as db:
-            current_ts = int(datetime.timestamp(datetime.now())) - 60
+            current_ts = int(datetime.timestamp(datetime.now())) - self.time_to_clean_messages
             await db.execute(sql, (current_ts,))
             await db.commit()

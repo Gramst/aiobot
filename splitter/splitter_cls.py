@@ -7,15 +7,17 @@ from .database import ReplyChain
 from .jobs import Job
 
 class Splitter:
-    jobs: list
+    clean_messages_older: int = 86400
+    tic_delay           : int = 5
+    jobs                : list
 
     def __init__(self, token: str, bases_path: str):
         self.jobs = []
         self.token = token
         self.base_url: str = f'https://api.telegram.org/bot{self.token}/'
         self.in_queue = asyncio.Queue()
-        self.reply_chain = ReplyChain(bases_path, 'reply.db')
-        self.jobs.append(Job.get_job(self.reply_chain.clear_old, 1))
+        self.reply_chain = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
+        self.jobs.append(Job.get_job(self.reply_chain.clear_old, 25))
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
@@ -24,13 +26,11 @@ class Splitter:
 
     async def kronos(self):
         while True:
-            print('run')
             [i.update_timer() for i in self.jobs]
             _ = [i for i in self.jobs if i.is_ready]
             for job in _:
                 await job.run()
-            print('sleep')
-            await asyncio.sleep(5)
+            await asyncio.sleep(self.tic_delay)
 
     async def process(self):
         while True:
