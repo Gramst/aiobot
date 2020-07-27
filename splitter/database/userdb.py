@@ -20,6 +20,9 @@ class User:
         self.active  = 1
         self.f_new   = True
 
+    def __repr__(self):
+        return f'User: chat_id {self.chat_id}, banned={self.banned}, active={self.active}, f_new={self.f_new};'
+
 
 class UsersDB:
     table_name = 'users'
@@ -38,20 +41,20 @@ class UsersDB:
         
 
     def make_db_table(self):
-        conn = sqlite3.connect(self.path + self.base_name)
+        conn = sqlite3.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES)
         c = conn.cursor()
-        c.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name} (id INTEGER, user_data BLOB, ban INTEGER, active INTEGER)")
+        c.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name} (id INTEGER, user_data pickle, ban INTEGER, active INTEGER)")
         conn.commit()
         conn.close()
 
     async def add_data(self, user: User):
-        async with aiosqlite.connect(self.path + self.base_name) as db:
+        async with aiosqlite.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES) as db:
             await db.execute(f"INSERT INTO {self.table_name} VALUES (?,?,?,?)", (user.chat_id, user, user.banned, user.active))
             await db.commit()
 
 
     async def get_data(self, chat_id: int) -> User:
-        async with aiosqlite.connect(self.path + self.base_name) as db:
+        async with aiosqlite.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES) as db:
             sql = f"SELECT * FROM {self.table_name} WHERE id=?"
             async with db.execute(sql, [(chat_id)]) as cursor:
                 res = await cursor.fetchone()
@@ -62,7 +65,7 @@ class UsersDB:
 
     async def get_active(self) -> List[User]:
         res = []
-        async with aiosqlite.connect(self.path + self.base_name) as db:
+        async with aiosqlite.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES) as db:
             sql = f"SELECT user_data FROM {self.table_name} WHERE active BETWEEN 1 and 1"
             async with db.execute(sql) as cursor:
                 res = await cursor.fetchmany()
