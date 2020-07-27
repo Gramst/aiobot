@@ -3,7 +3,7 @@ import asyncio
 from datetime import datetime
 
 from .tg import InMessage, OutMessage, ResponseMessage
-from .database import ReplyChain
+from .database import ReplyChain, User, UsersDB
 from .jobs import Job
 
 class Splitter:
@@ -17,6 +17,7 @@ class Splitter:
         self.base_url: str = f'https://api.telegram.org/bot{self.token}/'
         self.in_queue = asyncio.Queue()
         self.reply_chain = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
+        self.user_database = UsersDB(bases_path, 'reply.db')
         self.jobs.append(Job.get_job(self.reply_chain.clear_old, 25))
 
     async def income_msg(self, request) -> InMessage:
@@ -36,6 +37,8 @@ class Splitter:
         while True:
             income = await self.in_queue.get()
             if income.message:
+                master = self.user_database.get_data(income.message.chat.id)
+                print(master)
                 out = OutMessage()
                 if income.message.reply_to_message:
                     print(await self.reply_chain.get_reply(income.message.reply_to_message.message_id))

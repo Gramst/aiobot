@@ -16,12 +16,11 @@ class User:
 class UsersDB:
     table_name = 'users'
 
-    def __init__(self, path: str, base_name: str, time_to_clean_messages: int):
+    def __init__(self, path: str, base_name: str):
         sqlite3.register_converter("pickle", pickle.loads)
         sqlite3.register_adapter(User, pickle.dumps)
         self.path = path
         self.base_name = base_name
-        self.time_to_clean_messages = time_to_clean_messages
         if not os.path.isdir(self.path):
             os.mkdir(self.path)
         if not os.path.isfile(self.path + self.base_name):
