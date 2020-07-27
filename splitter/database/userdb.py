@@ -32,8 +32,7 @@ class UsersDB:
     def make_db_table(self):
         conn = sqlite3.connect(self.path + self.base_name)
         c = conn.cursor()
-        c.execute(  f"CREATE TABLE IF NOT EXISTS {self.table_name} "
-                    f"(id INTEGER, user_data BLOB, ban INTEGER, active INTEGER")
+        c.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name} (id INTEGER, user_data BLOB, ban INTEGER, active INTEGER)")
         conn.commit()
         conn.close()
 

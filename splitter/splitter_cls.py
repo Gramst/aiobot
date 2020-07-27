@@ -37,7 +37,7 @@ class Splitter:
         while True:
             income = await self.in_queue.get()
             if income.message:
-                master = self.user_database.get_data(income.message.chat.id)
+                master = await self.user_database.get_data(income.message.chat.id)
                 print(master)
                 out = OutMessage()
                 if income.message.reply_to_message:
