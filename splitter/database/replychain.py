@@ -5,6 +5,7 @@ import asyncio
 from datetime import datetime
 
 class ReplyChain:
+    table_name = 'messages'
 
     def __init__(self, path: str, base_name: str, time_to_clean_messages: int):
         self.path = path
@@ -21,18 +22,17 @@ class ReplyChain:
     def make_db_table(self):
         conn = sqlite3.connect(self.path + self.base_name)
         c = conn.cursor()
-        c.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name='stocks' ''')
+        c.execute(f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{self.table_name}'")
         if c.fetchone()[0]==1:
             pass
         else:
-            c.execute('''CREATE TABLE stocks
-                (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)''')
+            c.execute(f"CREATE TABLE {self.table_name} (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)")
         conn.commit()
         conn.close()
 
     async def add_data(self, from_tid: int, from_mid: int, to_tid: int, to_mid: int, time: int):
         async with aiosqlite.connect(self.path + self.base_name) as db:
-            await db.execute("INSERT INTO stocks VALUES (?,?,?,?,?)", (from_tid, from_mid, to_tid, to_mid, time))
+            await db.execute(f"INSERT INTO {self.table_name} VALUES (?,?,?,?,?)", (from_tid, from_mid, to_tid, to_mid, time))
             await db.commit()
 
 
@@ -40,17 +40,17 @@ class ReplyChain:
         res = []
         async with aiosqlite.connect(self.path + self.base_name) as db:
             _ = []
-            sql = "SELECT * FROM stocks WHERE toMID=?"
+            sql = f"SELECT * FROM {self.table_name} WHERE toMID=?"
             async with db.execute(sql, [(reply_to_message_id)]) as cursor:
                 _ = await cursor.fetchone()
             if _:
-                sql = "SELECT * FROM stocks WHERE fromMID=?"
+                sql = f"SELECT * FROM {self.table_name} WHERE fromMID=?"
                 async with db.execute(sql, [(_[1])]) as cursor:
                     res = await cursor.fetchmany()
         return res
 
     async def clear_old(self):
-        sql = 'DELETE FROM stocks WHERE time BETWEEN 0 and ?'
+        sql = f'DELETE FROM {self.table_name} WHERE time BETWEEN 0 and ?'
         async with aiosqlite.connect(self.path + self.base_name) as db:
             current_ts = int(datetime.timestamp(datetime.now())) - self.time_to_clean_messages
             await db.execute(sql, (current_ts,))
