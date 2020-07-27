@@ -4,13 +4,21 @@ import aiosqlite
 import os
 import asyncio
 import pickle
+from typing import List
 
 
 class User:
     chat_id : int
     banned  : int
     active  : int
-    pass
+    f_new   : bool
+    
+    
+    def __init__(self, chat_id):
+        self.chat_id = chat_id
+        self.banned  = 0
+        self.active  = 1
+        self.f_new   = True
 
 
 class UsersDB:
@@ -42,15 +50,17 @@ class UsersDB:
             await db.commit()
 
 
-    async def get_data(self, chat_id: int) -> list:
-        res = []
+    async def get_data(self, chat_id: int) -> User:
         async with aiosqlite.connect(self.path + self.base_name) as db:
             sql = f"SELECT * FROM {self.table_name} WHERE id=?"
             async with db.execute(sql, [(chat_id)]) as cursor:
                 res = await cursor.fetchone()
-        return res
+            if res:
+                return res[1]
+            else:
+                return User(chat_id)
 
-    async def get_active(self) -> list:
+    async def get_active(self) -> List[User]:
         res = []
         async with aiosqlite.connect(self.path + self.base_name) as db:
             sql = f"SELECT user_data FROM {self.table_name} WHERE active BETWEEN 1 and 1"

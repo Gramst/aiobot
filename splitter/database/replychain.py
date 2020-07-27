@@ -22,11 +22,7 @@ class ReplyChain:
     def make_db_table(self):
         conn = sqlite3.connect(self.path + self.base_name)
         c = conn.cursor()
-        c.execute(f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{self.table_name}'")
-        if c.fetchone()[0]==1:
-            pass
-        else:
-            c.execute(f"CREATE TABLE {self.table_name} (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)")
+        c.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name} (fromTID INTEGER, fromMID INTEGER, toTID INTEGER, toMID INTEGER, time INTEGER)")
         conn.commit()
         conn.close()
 

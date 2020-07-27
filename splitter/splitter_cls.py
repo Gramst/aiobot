@@ -39,6 +39,8 @@ class Splitter:
             if income.message:
                 master = await self.user_database.get_data(income.message.chat.id)
                 print(master)
+                if master.f_new:
+                    await self.user_database.add_data(master)
                 out = OutMessage()
                 if income.message.reply_to_message:
                     print(await self.reply_chain.get_reply(income.message.reply_to_message.message_id))
