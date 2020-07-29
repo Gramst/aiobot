@@ -8,9 +8,9 @@ from typing import List
 
 from .mix_db import gen_random_nick
 
+VER = 7
 
 class User:
-    VERSION : int = 4
     chat_id : int
     banned  : int
     active  : int
@@ -19,6 +19,7 @@ class User:
     
     
     def __init__(self, chat_id):
+        self.VERSION = VER
         self.chat_id = chat_id
         self.banned  = 0
         self.active  = 1
@@ -30,8 +31,8 @@ class User:
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
-#        if cls.VERSION == getattr(other, 'VERSION', 0):
-#            return other
+        if VER == getattr(other, 'VERSION', 0):
+            return other
         print('update user')
         res = cls(other.chat_id)
         res.banned = getattr(other, 'banned', 0)
