@@ -36,6 +36,16 @@ class ResponseMessage:
             self.result = Message.make_from_data(income_json.get('result'))
 
 class OutMessage:
+    base_url       : str
+    db             : 'ReplyChain'
+    file_id        : str
+    from_id        : int
+    from_message_id: int
+    text           : str
+    method         : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
+
+    def set_method(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
+        self.method = method
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
@@ -61,15 +71,14 @@ class OutMessage:
         #     self.method  = sendMessage
         #     self.file_id = other.message.sticker.file_id
 
-    @classmethod
-    def get_text_message(cls):
-        pass
 
-
-    async def send_to_server(self, base_url: str) -> ResponseMessage:
-        res = ResponseMessage(await self.method.do_request(base_url))
+    async def send_to_server(self, chat_id: int):
+        res = ResponseMessage(await self.method.do_request(self.base_url, chat_id: int))
         if res.ok:
-            res.from_id         = self.from_id
-            res.from_message_id = self.from_message_id
-            return res
-        return None
+            await self.db.add_data(
+                    self.from_id,
+                    self.from_message_id,
+                    res.result.chat.id,
+                    res.result.message_id,
+                    res.result.date
+                    )

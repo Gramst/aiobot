@@ -16,13 +16,16 @@ class Splitter:
     def __init__(self, token: str, bases_path: str):
         self.jobs = []
         self.token = token
-        self.base_url: str = f'https://api.telegram.org/bot{self.token}/'
+        #self.base_url: str = f'https://api.telegram.org/bot{self.token}/'
         self.in_queue = asyncio.Queue()
         self.out_queue = asyncio.Queue()
-        self.reply_chain = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
+        #self.reply_chain = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
         self.user_database = UsersDB(bases_path, 'reply.db')
         self.jobs.append(Job.get_job(self.reply_chain.clear_old, 25))
         self.users_list = []
+        self.out_message = OutMessage
+        self.out_message.db = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
+        self.out_message.base_url = f'https://api.telegram.org/bot{self.token}/'
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
@@ -31,16 +34,9 @@ class Splitter:
 
     async def send_out(self):
         while True:
-            out = await self.out_queue.get()
-            r_msg = await out.send_to_server(self.base_url)
-            if r_msg:
-                await self.reply_chain.add_data(
-                    r_msg.from_id,
-                    r_msg.from_message_id,
-                    r_msg.result.chat.id,
-                    r_msg.result.message_id,
-                    r_msg.result.date
-                    )
+            out: OutMessage = await self.out_queue.get()
+            await out.send_to_server(out.from_id)
+
 
     async def kronos(self):
         while True:
@@ -66,9 +62,7 @@ class Splitter:
 
                 print(master)
 
-                out = OutMessage()
-                if income.message.reply_to_message:
-                    print(await self.reply_chain.get_reply(income.message.reply_to_message.message_id))
+                out = self.out_message()
                 out << income
                 
                 self.out_queue.put_nowait(out)

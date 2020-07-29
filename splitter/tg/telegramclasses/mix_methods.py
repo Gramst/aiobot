@@ -12,13 +12,15 @@ class DataToSerialise:
 
 class AIODoRequest(DataToSerialise):
 
-    async def do_request(self, base_url) -> dict:
+    async def do_request(self, base_url: str, chat_id: int) -> dict:
         headers = {
             'Content-Type': 'application/json'
         }
+        data = self.get_data()
+        data['chat_id'] = chat_id
         async with ClientSession() as session:
             async with session.post(base_url + self.__class__.__name__,
-                                    data=json.dumps(self.get_data()),
+                                    data=json.dumps(data),
                                     headers=headers) as resp:
                 res = await resp.json()
                 return res
