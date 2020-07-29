@@ -21,11 +21,11 @@ class Splitter:
         self.out_queue = asyncio.Queue()
         #self.reply_chain = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
         self.user_database = UsersDB(bases_path, 'reply.db')
-        self.jobs.append(Job.get_job(self.reply_chain.clear_old, 25))
         self.users_list = []
         self.out_message = OutMessage
         self.out_message.db = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
         self.out_message.base_url = f'https://api.telegram.org/bot{self.token}/'
+        self.jobs.append(Job.get_job(self.out_message.db.clear_old, 25))
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()

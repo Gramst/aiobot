@@ -73,7 +73,7 @@ class OutMessage:
 
 
     async def send_to_server(self, chat_id: int):
-        res = ResponseMessage(await self.method.do_request(self.base_url, chat_id: int))
+        res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
         if res.ok:
             await self.db.add_data(
                     self.from_id,
