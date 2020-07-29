@@ -6,13 +6,16 @@ import asyncio
 import pickle
 from typing import List
 
+from .mix_db import gen_random_nick
+
 
 class User:
-    VERSION : int = 1
+    VERSION : int = 2
     chat_id : int
     banned  : int
     active  : int
     f_new   : bool
+    nick    : str
     
     
     def __init__(self, chat_id):
@@ -20,9 +23,10 @@ class User:
         self.banned  = 0
         self.active  = 1
         self.f_new   = True
+        self.nick    = gen_random_nick()
 
     def __repr__(self):
-        return f'User: chat_id {self.chat_id}, banned={self.banned}, active={self.active}, f_new={self.f_new};'
+        return f'User: chat_id {self.chat_id}, banned={self.banned}, active={self.active}, f_new={self.f_new}; [VER {self.VERSION}]'
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
@@ -31,8 +35,9 @@ class User:
         res = cls(other.chat_id)
         res.banned = getattr(other, 'banned', 0)
         res.active = getattr(other, 'active', 1)
+        res.nick   = getattr(other, 'nick', gen_random_nick())
+        res.__repr__ = cls.__repr__
         return res
-
 
 class UsersDB:
     table_name = 'users'
