@@ -10,7 +10,7 @@ from .mix_db import gen_random_nick
 
 
 class User:
-    VERSION : int = 3
+    VERSION : int = 4
     chat_id : int
     banned  : int
     active  : int
@@ -30,15 +30,13 @@ class User:
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
-        print(getattr(other, 'VERSION', 0))
-        if cls.VERSION == getattr(other, 'VERSION', 0):
-            return other
+#        if cls.VERSION == getattr(other, 'VERSION', 0):
+#            return other
         print('update user')
         res = cls(other.chat_id)
         res.banned = getattr(other, 'banned', 0)
         res.active = getattr(other, 'active', 1)
         res.nick   = getattr(other, 'nick', gen_random_nick())
-        res.__repr__ = cls.__repr__
         return res
 
 class UsersDB:
@@ -84,7 +82,7 @@ class UsersDB:
             async with db.execute(sql, [(chat_id)]) as cursor:
                 res = await cursor.fetchone()
             if res:
-                return res[1]
+                return User.check_version(res[1])
             else:
                 return None
 

@@ -73,4 +73,4 @@ class Splitter:
                 
                 self.out_queue.put_nowait(out)
 
-                self.user_database.update_data(master)
+                await self.user_database.update_data(master)
