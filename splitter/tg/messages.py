@@ -61,6 +61,11 @@ class OutMessage:
         #     self.method  = sendMessage
         #     self.file_id = other.message.sticker.file_id
 
+    @classmethod
+    def get_text_message(cls):
+        pass
+
+
     async def send_to_server(self, base_url: str) -> ResponseMessage:
         res = ResponseMessage(await self.method.do_request(base_url))
         if res.ok:

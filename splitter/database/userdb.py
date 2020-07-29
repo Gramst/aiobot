@@ -76,10 +76,7 @@ class UsersDB:
         async with aiosqlite.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES) as db:
             async with db.execute(sql, [(chat_id)]) as cursor:
                 res = await cursor.fetchone()
-            if res:
-                return User.check_version(res[1])
-            else:
-                return User(chat_id)
+            return res[1]
 
     async def get_active(self) -> List[User]:
         sql = f"SELECT user_data FROM {self.table_name} WHERE active BETWEEN 1 and 1"

@@ -22,6 +22,7 @@ if __name__ == '__main__':
     loop = asyncio.get_event_loop()
     main_task = loop.create_task(bot.process())
     kronos_task = loop.create_task(bot.kronos())
+    send_task = loop.create_task(bot.send_out())
     try:
         app = loop.run_until_complete(init_app(loop, bot))
         web.run_app(app, host='0.0.0.0', port=8443, ssl_context=sslcontext)
