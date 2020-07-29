@@ -42,6 +42,7 @@ class OutMessage:
     from_id        : int
     from_message_id: int
     text           : str
+    promt          : str
     method         : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
 
     def set_method(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
@@ -53,8 +54,11 @@ class OutMessage:
         self.from_id = other.message.from_u.id
         self.from_message_id = other.message.message_id
         if other.message.text:
+            text = other.message.text
+            if self.promt:
+                text = self.promt + text
             self.method  = sendMessage( other.message.from_u.id,
-                                        other.message.text)
+                                        text)
         if other.message.photo:
             self.method = sendPhoto(other.message.from_u.id,
                                     other.message.photo[0].file_id,

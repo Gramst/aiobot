@@ -63,6 +63,7 @@ class Splitter:
                 print(master)
 
                 out = self.out_message()
+                out.promt = master.nick + ' : '
                 out << income
                 
                 self.out_queue.put_nowait(out)
