@@ -10,7 +10,7 @@ from .mix_db import gen_random_nick
 
 
 class User:
-    VERSION : int = 2
+    VERSION : int = 3
     chat_id : int
     banned  : int
     active  : int
@@ -26,12 +26,13 @@ class User:
         self.nick    = gen_random_nick()
 
     def __repr__(self):
-        return f'User: chat_id {self.chat_id}, banned={self.banned}, active={self.active}, f_new={self.f_new}; [VER {self.VERSION}]'
+        return f'User: chat_id {self.chat_id}, nick {self.nick}, banned={self.banned}, active={self.active}, f_new={self.f_new}; [VER {self.VERSION}]'
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
         if cls.VERSION == getattr(other, 'VERSION', 0):
             return other
+        print('update user')
         res = cls(other.chat_id)
         res.banned = getattr(other, 'banned', 0)
         res.active = getattr(other, 'active', 1)
