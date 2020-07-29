@@ -30,6 +30,7 @@ class User:
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
+        print(getattr(other, 'VERSION', 0))
         if cls.VERSION == getattr(other, 'VERSION', 0):
             return other
         print('update user')
