@@ -64,6 +64,8 @@ class Splitter:
                         await self.user_database.add_data(master)
                     self.users_list.append(master)
 
+                print(master)
+
                 out = OutMessage()
                 if income.message.reply_to_message:
                     print(await self.reply_chain.get_reply(income.message.reply_to_message.message_id))

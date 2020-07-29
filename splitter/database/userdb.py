@@ -25,7 +25,7 @@ class User:
         return f'User: chat_id {self.chat_id}, banned={self.banned}, active={self.active}, f_new={self.f_new};'
 
     @classmethod
-    def check_version(cls, other: User) -> User:
+    def check_version(cls, other: 'User') -> 'User':
         if cls.VERSION == getattr(other, 'VERSION', 0):
             return other
         res = cls(other.chat_id)
@@ -76,7 +76,10 @@ class UsersDB:
         async with aiosqlite.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES) as db:
             async with db.execute(sql, [(chat_id)]) as cursor:
                 res = await cursor.fetchone()
-            return res[1]
+            if res:
+                return res[1]
+            else:
+                return None
 
     async def get_active(self) -> List[User]:
         sql = f"SELECT user_data FROM {self.table_name} WHERE active BETWEEN 1 and 1"
