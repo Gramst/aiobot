@@ -45,6 +45,14 @@ class ReplyChain:
                     res = await cursor.fetchmany()
         return res
 
+    async def get_id_from_reply(self, reply_to_message_id: int) -> int:
+        _ = []
+        sql = f"SELECT * FROM {self.table_name} WHERE toMID=?"
+        async with aiosqlite.connect(self.path + self.base_name) as db:
+            async with db.execute(sql, [(reply_to_message_id)]) as cursor:
+                _ = await cursor.fetchone()
+        
+
     async def clear_old(self):
         sql = f'DELETE FROM {self.table_name} WHERE time BETWEEN 0 and ?'
         async with aiosqlite.connect(self.path + self.base_name) as db:

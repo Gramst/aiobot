@@ -44,6 +44,7 @@ class OutMessage:
     text           : str
     promt          : str
     method         : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
+    db_ids         : List[list]
 
     def set_method(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
         self.method = method
