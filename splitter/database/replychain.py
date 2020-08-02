@@ -46,13 +46,14 @@ class ReplyChain:
         return res
 
     async def get_id_from_reply(self, reply_to_message_id: int) -> int:
+        print(reply_to_message_id)
         _ = []
         sql = f"SELECT * FROM {self.table_name} WHERE toMID=?"
         async with aiosqlite.connect(self.path + self.base_name) as db:
             async with db.execute(sql, [(reply_to_message_id)]) as cursor:
                 _ = await cursor.fetchone()
         if _:
-            return [0]
+            return _[0]
         return None
         
 

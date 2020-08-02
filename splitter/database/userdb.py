@@ -87,10 +87,16 @@ class UsersDB:
             else:
                 return None
 
-    async def get_active(self) -> List[User]:
+    def get_active(self) -> List[User]:
         sql = f"SELECT user_data FROM {self.table_name} WHERE active BETWEEN 1 and 1"
         res = []
-        async with aiosqlite.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES) as db:
-            async with db.execute(sql) as cursor:
-                res = await cursor.fetchmany()
+        conn = sqlite3.connect(self.path + self.base_name, detect_types=sqlite3.PARSE_DECLTYPES)
+        c = conn.cursor()
+        c.execute(sql)
+        _ = c.fetchall()
+        if _:
+            res = [i[0] for i in _]
+        conn.commit()
+        conn.close()
+        print(res)
         return res

@@ -20,7 +20,7 @@ class Splitter:
         self.in_queue = asyncio.Queue()
         self.out_queue = asyncio.Queue()
         self.user_database = UsersDB(bases_path, 'reply.db')
-        self.users_list = []
+        self.users_list = self.user_database.get_active()
         self.out_message = OutMessage
         self.message_database = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
         self.out_message.db = self.message_database
@@ -36,7 +36,6 @@ class Splitter:
         while True:
             out: OutMessage = await self.out_queue.get()
             await out.send_to_server(out.from_id)
-
 
     async def kronos(self):
         while True:
@@ -59,7 +58,7 @@ class Splitter:
                 out << income
                 await out.get_reply_block()
                 #self.out_queue.put_nowait(out)
-                [await out.send_to_server(i.chat_id) for i in self.users_list]
+                [await out.send_to_server(i.chat_id) for i in self.users_list if i.chat_id != master.chat_id]
 
                 await self.user_database.update_data(master)
 
@@ -83,12 +82,13 @@ class Splitter:
             slave_id = None
             if income.message.reply_to_message:
                 slave_id = await self.message_database.get_id_from_reply(income.message.reply_to_message.message_id)
+                print(slave_id)
             if slave_id:
                 _ = [i for i in self.users_list if i.chat_id == slave_id]
                 if _:
                     slave = _[0]
                 else:
-                    slave = await self.user_database.get_data(income.message.chat.id)                
+                    slave = await self.user_database.get_data(slave_id)                
                     if not slave:
                         return None
         return slave
