@@ -21,9 +21,10 @@ class Splitter:
         self.user_database = UsersDB(bases_path, 'reply.db')
         self.users_list = []
         self.out_message = OutMessage
-        self.out_message.db = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
+        self.message_database = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
+        self.out_message.db = self.message_database
         self.out_message.base_url = f'https://api.telegram.org/bot{self.token}/'
-        self.jobs.append(Job.get_job(self.out_message.db.clear_old, 25))
+        self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
@@ -50,6 +51,8 @@ class Splitter:
         while True:
             income = await self.in_queue.get()
             master = await self.get_master_user(income)
+            slave  = await self.get_slave_user(income)
+            print(master, slave)
 
             if master:
                 out = self.out_message()
@@ -78,13 +81,13 @@ class Splitter:
     async def get_slave_user(self, income: InMessage) -> User:
         slave = None
         if income.message:
-            _ = [i for i in self.users_list if i.chat_id == income.message.chat.id]
+            if income.message.reply_to_message:
+                slave_id = await self.message_database.get_id_from_reply(income.message.reply_to_message.message_id)
+            _ = [i for i in self.users_list if i.chat_id == slave_id]
             if _:
-                master = _[0]
+                slave = _[0]
             else:
-                master = await self.user_database.get_data(income.message.chat.id)                
-                if not master:
-                    master = User(income.message.chat.id)
-                    await self.user_database.add_data(master)
-                self.users_list.append(master)
-        return master
+                slave = await self.user_database.get_data(income.message.chat.id)                
+                if not slave:
+                    return None
+        return slave

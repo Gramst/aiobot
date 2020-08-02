@@ -51,6 +51,9 @@ class ReplyChain:
         async with aiosqlite.connect(self.path + self.base_name) as db:
             async with db.execute(sql, [(reply_to_message_id)]) as cursor:
                 _ = await cursor.fetchone()
+        if _:
+            return [0]
+        return None
         
 
     async def clear_old(self):

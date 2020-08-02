@@ -5,6 +5,8 @@ import asyncio
 from .telegramclasses.t_messages import Message, CallbackQuery
 from .telegramclasses.t_methods import sendMessage, sendPhoto, sendAudio, sendVoice
 
+from ..database import ReplyChain
+
 class InMessage:
     message : Message       = None
     callback: CallbackQuery = None
@@ -37,7 +39,7 @@ class ResponseMessage:
 
 class OutMessage:
     base_url       : str
-    db             : 'ReplyChain'
+    db             : ReplyChain
     file_id        : str
     from_id        : int
     from_message_id: int
