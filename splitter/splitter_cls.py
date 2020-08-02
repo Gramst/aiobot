@@ -3,7 +3,7 @@ import asyncio
 from datetime import datetime
 from typing import List
 
-from .tg import InMessage, OutMessage, ResponseMessage
+from .tg import InMessage, OutMessage, ResponseMessage, Menu
 from .database import ReplyChain, User, UsersDB
 from .jobs import Job
 
@@ -12,6 +12,7 @@ class Splitter:
     tic_delay           : int = 5
     jobs                : list
     users_list          : List[User]
+    menu_list           : List[Menu]
 
     def __init__(self, token: str, bases_path: str):
         self.jobs = []
