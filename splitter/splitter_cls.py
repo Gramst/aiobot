@@ -29,14 +29,14 @@ class Splitter:
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
         self.in_queue.put_nowait(InMessage(data))
-        self.in_queue.task_done()
+#        self.in_queue.task_done()
         return web.Response(status=200)
 
     async def send_out(self):
         while True:
             out: OutMessage = await self.out_queue.get()
             await out.send_to_server(out.from_id)
-            self.out_queue.task_done()
+#            self.out_queue.task_done()
 
 
     async def kronos(self):
@@ -52,7 +52,7 @@ class Splitter:
             income = await self.in_queue.get()
             master = await self.get_master_user(income)
             slave  = await self.get_slave_user(income)
-            print(master, slave)
+            print(master, '\n',  slave)
 
             if master:
                 out = self.out_message()
@@ -60,7 +60,7 @@ class Splitter:
                 out << income
                 
                 self.out_queue.put_nowait(out)
-                self.in_queue.task_done()
+#                self.in_queue.task_done()
 
                 await self.user_database.update_data(master)
 
@@ -81,13 +81,15 @@ class Splitter:
     async def get_slave_user(self, income: InMessage) -> User:
         slave = None
         if income.message:
+            slave_id = None
             if income.message.reply_to_message:
                 slave_id = await self.message_database.get_id_from_reply(income.message.reply_to_message.message_id)
-            _ = [i for i in self.users_list if i.chat_id == slave_id]
-            if _:
-                slave = _[0]
-            else:
-                slave = await self.user_database.get_data(income.message.chat.id)                
-                if not slave:
-                    return None
+            if slave_id:
+                _ = [i for i in self.users_list if i.chat_id == slave_id]
+                if _:
+                    slave = _[0]
+                else:
+                    slave = await self.user_database.get_data(income.message.chat.id)                
+                    if not slave:
+                        return None
         return slave
