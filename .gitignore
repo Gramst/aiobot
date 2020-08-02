@@ -13,3 +13,4 @@ nonpublic.py
 .vscode/settings.json
 brati*
 *.db
+log.txt
