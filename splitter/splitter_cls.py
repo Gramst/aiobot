@@ -29,14 +29,12 @@ class Splitter:
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
         self.in_queue.put_nowait(InMessage(data))
-#        self.in_queue.task_done()
         return web.Response(status=200)
 
     async def send_out(self):
         while True:
             out: OutMessage = await self.out_queue.get()
             await out.send_to_server(out.from_id)
-#            self.out_queue.task_done()
 
 
     async def kronos(self):
@@ -60,7 +58,6 @@ class Splitter:
                 out << income
                 
                 self.out_queue.put_nowait(out)
-#                self.in_queue.task_done()
 
                 await self.user_database.update_data(master)
 

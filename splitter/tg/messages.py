@@ -46,7 +46,8 @@ class OutMessage:
     text           : str
     promt          : str
     method         : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
-    db_ids         : List[list]
+    reply_to       : int        = None
+    db_ids         : List[list] = []
 
     def set_method(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
         self.method = method
@@ -56,6 +57,9 @@ class OutMessage:
             return
         self.from_id = other.message.from_u.id
         self.from_message_id = other.message.message_id
+        if other.message.reply_to_message:
+            self.reply_to = other.message.reply_to_message.message_id
+            self.get_reply_block()
         if other.message.text:
             text = other.message.text
             if self.promt:
@@ -78,8 +82,20 @@ class OutMessage:
         #     self.method  = sendMessage
         #     self.file_id = other.message.sticker.file_id
 
+    async def get_reply_block(self):
+        if self.reply_to:
+            self.db_ids = self.db.get_reply(self.reply_to)
+
+    def get_message_id_for_reply(self, chat_id: int) -> int:
+        if self.db_ids:
+            _ = [i[3] for i in self.db_ids if i[2] == chat_id]
+            if _:
+                return _[0]
+        return None
 
     async def send_to_server(self, chat_id: int):
+        if self.db_ids:
+            self.method.reply_to_message_id = self.get_message_id_for_reply(chat_id)
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
         if res.ok:
             await self.db.add_data(
