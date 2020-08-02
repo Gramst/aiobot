@@ -57,8 +57,8 @@ class OutMessage:
             return
         self.from_id = other.message.from_u.id
         self.from_message_id = other.message.message_id
-        if other.message.reply_to_message_id_message:
-            self.reply_to_message_id = other.message.reply_to_message_id_message.message_id
+        if other.message.reply_to_message:
+            self.reply_to_message_id = other.message.reply_to_message.message_id
         if other.message.text:
             text = other.message.text
             if self.promt:
