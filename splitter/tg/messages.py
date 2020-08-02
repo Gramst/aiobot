@@ -59,7 +59,6 @@ class OutMessage:
         self.from_message_id = other.message.message_id
         if other.message.reply_to_message:
             self.reply_to = other.message.reply_to_message.message_id
-            self.get_reply_block()
         if other.message.text:
             text = other.message.text
             if self.promt:
@@ -84,7 +83,7 @@ class OutMessage:
 
     async def get_reply_block(self):
         if self.reply_to:
-            self.db_ids = self.db.get_reply(self.reply_to)
+            self.db_ids = await self.db.get_reply(self.reply_to)
 
     def get_message_id_for_reply(self, chat_id: int) -> int:
         if self.db_ids:

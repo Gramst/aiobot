@@ -56,7 +56,7 @@ class Splitter:
                 out = self.out_message()
                 out.promt = master.nick + ' : '
                 out << income
-                
+                await out.get_reply_block()
                 self.out_queue.put_nowait(out)
 
                 await self.user_database.update_data(master)
