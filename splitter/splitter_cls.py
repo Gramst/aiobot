@@ -10,7 +10,7 @@ from .jobs import Job
 class Splitter:
     clean_messages_older: int = 86400
     tic_delay           : int = 5
-    jobs                : list
+    jobs                : List[Job]
     users_list          : List[User]
     menu_list           : List[Menu]
 
@@ -58,7 +58,8 @@ class Splitter:
                 out.promt = master.nick + ' : '
                 out << income
                 await out.get_reply_block()
-                self.out_queue.put_nowait(out)
+                #self.out_queue.put_nowait(out)
+                [await out.send_to_server(i.chat_id) for i in self.users_list]
 
                 await self.user_database.update_data(master)
 
