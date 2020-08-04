@@ -25,7 +25,8 @@ class Splitter:
         self.out_message = OutMessage
         self.message_database = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
         self.out_message.db = self.message_database
-        self.out_message.base_url = f'https://api.telegram.org/bot{self.token}/'
+        self.base_url = f'https://api.telegram.org/bot{self.token}/'
+        self.out_message.base_url = self.base_url
         self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
 
     async def income_msg(self, request) -> InMessage:
@@ -53,7 +54,10 @@ class Splitter:
             slave  = await self.get_slave_user(income)
             print(master, '\n',  slave)
 
-            if master:
+            if income.callback:
+                await answerCallbackQuery(income.callback.id, 'Oh, you touch my talala').do_request(self.base_url, 0)
+
+            if master and not income.callback:
                 out = self.out_message()
                 out.promt = master.nick + ' : '
                 out << income
@@ -65,8 +69,6 @@ class Splitter:
 
     async def get_master_user(self, income: InMessage) -> User:
         master = None
-        if income.callback:
-            await answerCallbackQuery(income.callback.id, 'Oh, you touch my talala').do_request(self.base_url, 0)
         if income.message:
             _ = [i for i in self.users_list if i.chat_id == income.message.chat.id]
             if _:
