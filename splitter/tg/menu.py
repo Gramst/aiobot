@@ -1,7 +1,20 @@
-from hashids import Hashids
+from nanoid import generate
 
-hash = Hashids()
+from ..database import User
+from .messages  import OutMessage
 
+class Page:
+    buttons
+    text
+    data
 
 class Menu:
-    pass
+    menu_id: str
+    master: User
+
+    def __init__(self, master):
+        self.menu_id = generate(size=8)
+        self.master  = master
+
+    def reg_page(self, page: Page):
+        pass

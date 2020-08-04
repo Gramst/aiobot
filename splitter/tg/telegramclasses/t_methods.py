@@ -6,7 +6,7 @@ from .mix_methods import AIODoRequest
 
 @dataclass
 class sendMessage(AIODoRequest):
-    chat_id                 : int
+    #chat_id                 : int = field(init=False)
     text                    : str
     parse_mode              : str  = 'html'
     disable_web_page_preview: bool = False
@@ -17,7 +17,7 @@ class sendMessage(AIODoRequest):
 
 @dataclass
 class sendPhoto(AIODoRequest):
-    chat_id             : int
+    #chat_id             : int
     photo               : str
     caption             : str  = ''
     parse_mode          : str  = 'html'
@@ -27,7 +27,7 @@ class sendPhoto(AIODoRequest):
 
 @dataclass
 class sendAudio(AIODoRequest):
-    chat_id             : int
+    #chat_id             : int
     audio               : str
     caption             : str  = ''
     parse_mode          : str  = 'html'
@@ -41,7 +41,7 @@ class sendAudio(AIODoRequest):
 
 @dataclass
 class sendVoice(AIODoRequest):
-    chat_id             : int
+    #chat_id             : int
     voice               : str
     caption             : str  = ''
     parse_mode          : str  = 'html'

@@ -4,6 +4,7 @@ import asyncio
 
 from .telegramclasses.t_messages import Message, CallbackQuery
 from .telegramclasses.t_methods import sendMessage, sendPhoto, sendAudio, sendVoice
+from .telegramclasses.t_messages import InlineKeyboardMarkup, InlineKeyboardButton
 
 from ..database import ReplyChain
 
@@ -49,8 +50,30 @@ class OutMessage:
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
 
-    def set_method(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
-        self.method = method
+    def __init__(self, **kwargs):
+        self.file_id = kwargs.get('file_id')
+        self.from_id = kwargs.get('from_id')
+        self.text    = kwargs.get('text')
+        self.promt   = kwargs.get('promt', '')
+
+    def gen_message(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
+        if isinstance(method, sendMessage):
+            if self.text:
+                self.method = sendMessage(text = self.promt + self.text)
+        if isinstance(method, sendPhoto):
+            if self.file_id:
+                if self.text:
+                    self.method = sendPhoto(photo   = self.file_id,
+                                            caption = self.promt + self.text)
+                else:
+                    button = InlineKeyboardButton(  text = self.promt,
+                                                    callback_data='asd')
+                    self.method = sendPhoto(photo        = self.file_id,
+                                            reply_markup = InlineKeyboardMarkup(inline_keyboard = [button])
+        if isinstance(method, sendVoice):
+            if self.file_id:
+                self.method = sendVoice(voice = self.file_id)
+
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
@@ -63,19 +86,15 @@ class OutMessage:
             text = other.message.text
             if self.promt:
                 text = self.promt + text
-            self.method  = sendMessage( other.message.from_u.id,
-                                        text)
+            self.method  = sendMessage(text)
         if other.message.photo:
-            self.method = sendPhoto(other.message.from_u.id,
-                                    other.message.photo[0].file_id,
+            self.method = sendPhoto(other.message.photo[0].file_id,
                                     caption = other.message.caption)
         if other.message.audio:
-            self.method = sendAudio(other.message.from_u.id,
-                                    other.message.audio.file_id,
+            self.method = sendAudio(other.message.audio.file_id,
                                     caption = other.message.audio.file_id)
         if other.message.voice:
-            self.method = sendVoice(other.message.from_u.id,
-                                    other.message.voice.file_id,
+            self.method = sendVoice(other.message.voice.file_id,
                                     caption = other.message.voice.file_id)
         # if other.message.sticker:
         #     self.method  = sendMessage
@@ -85,7 +104,7 @@ class OutMessage:
         if self.reply_to_message_id:
             self.reply_messages_ids = await self.db.get_reply(self.reply_to_message_id)
 
-    def get_message_id_for_reply(self, chat_id: int) -> int:
+    def _get_message_id_for_reply(self, chat_id: int) -> int:
         if self.reply_messages_ids:
             _ = [i[3] for i in self.reply_messages_ids if i[2] == chat_id]
             if _:
@@ -94,9 +113,9 @@ class OutMessage:
 
     async def send_to_server(self, chat_id: int):
         if self.reply_messages_ids:
-            self.method.reply_to_message_id = self.get_message_id_for_reply(chat_id)
+            self.method.reply_to_message_id = self._get_message_id_for_reply(chat_id)
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
-        if res.ok:
+        if res.ok and (self.from_id and self.from_message_id):
             await self.db.add_data(
                     self.from_id,
                     self.from_message_id,

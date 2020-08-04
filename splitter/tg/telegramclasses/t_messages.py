@@ -312,12 +312,12 @@ class InlineKeyboardButton(FromIncomeData):
     KEYS = ['text', 'url', 'login_url', 'callback_data', 'switch_inline_query',
     'switch_inline_query_current_chat', 'pay']
     text               : str 
-    url                : str 
-    __login_url        : dict = field(repr=False)
+    url                : str = ''
+    __login_url        : dict = field(repr=False, default_factory=dict)
     login_url          : 'LoginUrl' = field(init=False)
-    callback_data      : str
-    switch_inline_query: str
-    switch_inline_query_current_chat: str 
+    callback_data      : str = ''
+    switch_inline_query: str = ''
+    switch_inline_query_current_chat: str = ''
     #TODO callback_game	CallbackGame
     pay                : bool
 
@@ -326,7 +326,7 @@ class InlineKeyboardButton(FromIncomeData):
 
 @dataclass
 class InlineKeyboardMarkup(FromIncomeData):
-    __inline_keyboard: list = field(repr=False)
+    __inline_keyboard: list = field(repr=False, default_factory = list)
     inline_keyboard  : list = field(init=False)
 
     def __post_init__(self):
