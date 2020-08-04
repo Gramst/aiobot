@@ -114,7 +114,14 @@ class OutMessage:
                 return _[0]
         return None
 
-    async def send_to_server(self, chat_id: int):
+    def set_destination(self, dest: List[int]):
+        self.destinations = dest
+
+    async def send_to_server(self):
+        for i in self.destinations:
+            await self._send_to_server(i)
+
+    async def _send_to_server(self, chat_id: int):
         if self.reply_messages_ids:
             self.method.reply_to_message_id = self._get_message_id_for_reply(chat_id)
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))

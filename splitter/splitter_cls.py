@@ -37,7 +37,7 @@ class Splitter:
     async def send_out(self):
         while True:
             out: OutMessage = await self.out_queue.get()
-            await out.send_to_server(out.from_id)
+            await out.send_to_server()
 
     async def kronos(self):
         while True:
@@ -63,8 +63,8 @@ class Splitter:
                 out << income
                 await out.get_reply_block()
                 #self.out_queue.put_nowait(out)
-                [await out.send_to_server(i.chat_id) for i in self.users_list] # if i.chat_id != master.chat_id]
-
+                out.set_destination([i.chat_id for i in self.users_list]) # if i.chat_id != master.chat_id]
+                self.out_queue.put_nowait(out)
                 await self.user_database.update_data(master)
 
     async def get_master_user(self, income: InMessage) -> User:
