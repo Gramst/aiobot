@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List
 
 from .tg import InMessage, OutMessage, ResponseMessage, Menu
+from .tg.telegramclasses.t_methods import answerCallbackQuery
 from .database import ReplyChain, User, UsersDB
 from .jobs import Job
 
@@ -64,6 +65,8 @@ class Splitter:
 
     async def get_master_user(self, income: InMessage) -> User:
         master = None
+        if income.callback:
+            await answerCallbackQuery(income.callback.id, 'Oh, you touch my talala').do_request(self.base_url, 0)
         if income.message:
             _ = [i for i in self.users_list if i.chat_id == income.message.chat.id]
             if _:

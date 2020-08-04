@@ -49,3 +49,11 @@ class sendVoice(AIODoRequest):
     disable_notification: bool = False
     reply_to_message_id : int  = None
     reply_markup        : Union[InlineKeyboardMarkup, ReplyKeyboardMarkup, ReplyKeyboardRemove, ForceReply] = None
+
+@dataclass
+class answerCallbackQuery(AIODoRequest):
+    callback_query_id : str
+    text              : str = ''
+    show_alert        : bool = False
+    url               : str = ''
+    cache_time        : int = 0
