@@ -118,8 +118,8 @@ class OutMessage:
         self.destinations = dest
 
     async def send_to_server(self):
-        for i in self.destinations:
-            await self._send_to_server(i)
+        _ = [self._send_to_server(i) for i in self.destinations]
+        await asyncio.wait(_)
 
     async def _send_to_server(self, chat_id: int):
         if self.reply_messages_ids:
