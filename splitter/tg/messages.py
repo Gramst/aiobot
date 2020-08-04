@@ -69,7 +69,7 @@ class OutMessage:
                     button = InlineKeyboardButton(  text = self.promt,
                                                     callback_data='asd')
                     self.method = sendPhoto(photo        = self.file_id,
-                                            reply_markup = InlineKeyboardMarkup(inline_keyboard = [button])
+                                            reply_markup = InlineKeyboardMarkup(inline_keyboard = [button]))
         if isinstance(method, sendVoice):
             if self.file_id:
                 self.method = sendVoice(voice = self.file_id)
@@ -92,7 +92,7 @@ class OutMessage:
                                             callback_data='asd')
             self.method = sendPhoto(other.message.photo[0].file_id,
                                     caption = other.message.caption,
-                                    reply_markup = InlineKeyboardMarkup(inline_keyboard = [button]))
+                                    reply_markup = InlineKeyboardMarkup([[button]]))
         if other.message.audio:
             self.method = sendAudio(other.message.audio.file_id,
                                     caption = other.message.audio.file_id)

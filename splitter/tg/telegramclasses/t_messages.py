@@ -319,7 +319,7 @@ class InlineKeyboardButton(FromIncomeData):
     switch_inline_query: str = ''
     switch_inline_query_current_chat: str = ''
     #TODO callback_game	CallbackGame
-    pay                : bool
+    pay                : bool = False
 
     def __post_init__(self):
         self.login_url: 'LoginUrl' = LoginUrl.make_from_data(self.__login_url)

@@ -58,7 +58,7 @@ class Splitter:
                 out << income
                 await out.get_reply_block()
                 #self.out_queue.put_nowait(out)
-                [await out.send_to_server(i.chat_id) for i in self.users_list if i.chat_id != master.chat_id]
+                [await out.send_to_server(i.chat_id) for i in self.users_list] # if i.chat_id != master.chat_id]
 
                 await self.user_database.update_data(master)
 

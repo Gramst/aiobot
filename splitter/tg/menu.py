@@ -4,9 +4,7 @@ from ..database import User
 from .messages  import OutMessage
 
 class Page:
-    buttons
-    text
-    data
+    pass
 
 class Menu:
     menu_id: str
