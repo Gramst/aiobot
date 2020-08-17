@@ -35,6 +35,7 @@ class User:
     def check_version(cls, other: 'User') -> 'User':
         other_version = getattr(other, 'VERSION', 0)
         if VER == other_version:
+            print('Version check OK')
             return other
         print(f'Update User from {other_version} to {VER}')
         res = cls(other.chat_id)
@@ -106,5 +107,6 @@ class UsersDB:
             res = [i[0] for i in _]
         conn.commit()
         conn.close()
+        res = [User.check_version(i) for i in res]
         print(res)
         return res

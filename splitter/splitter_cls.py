@@ -28,7 +28,10 @@ class Splitter:
         self.base_url = f'https://api.telegram.org/bot{self.token}/'
         self.out_message.base_url = self.base_url
         self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
-        self.jobs.append(Job.get_job([i.update for i in self.users_list if i], 5))
+        self.jobs.append(Job.get_job(self._user_update, 5))
+
+    async def _user_update(self):
+        [i.update() for i in self.users_list if i]
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
