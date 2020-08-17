@@ -5,7 +5,7 @@ After=syslog.target network.target
 Type=simple
 User=USER_NAME
 WorkingDirectory=/home/USER_NAME/aiobot
-ExecStart=/home/USER_NAME/aiobot/.vnv/bin/python /home/USER_NAME/aiobot/main.py
+ExecStart=/home/USER_NAME/aiobot/.vnv/bin/python -u /home/USER_NAME/aiobot/main.py
 Restart=on-abort
 
 [Install]
