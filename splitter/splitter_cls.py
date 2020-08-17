@@ -69,7 +69,8 @@ class Splitter:
                 out.set_destination([i.chat_id for i in self.users_list]) # if i.chat_id != master.chat_id]
                 self.out_queue.put_nowait(out)
                 await self.user_database.update_data(master)
-                await self.user_database.update_data(slave)
+                if slave:
+                    await self.user_database.update_data(slave)
 
     async def get_master_user(self, income: InMessage) -> User:
         master = None
