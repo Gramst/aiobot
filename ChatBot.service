@@ -1,0 +1,12 @@
+Description=ChatBot
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=USER_NAME
+WorkingDirectory=/home/USER_NAME/aiobot
+ExecStart=/home/USER_NAME/aiobot/.vnv/bin/python /home/USER_NAME/aiobot/main.py
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
