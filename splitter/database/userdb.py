@@ -8,7 +8,7 @@ from typing import List
 
 from .mix_db import gen_random_nick
 
-VER = 7
+VER = 8
 
 class User:
     chat_id : int
@@ -16,6 +16,7 @@ class User:
     active  : int
     f_new   : bool
     nick    : str
+    tick    : int
     
     
     def __init__(self, chat_id):
@@ -25,20 +26,27 @@ class User:
         self.active  = 1
         self.f_new   = True
         self.nick    = gen_random_nick()
+        self.tick    = 0
 
     def __repr__(self):
-        return f'User: chat_id {self.chat_id}, nick {self.nick}, banned={self.banned}, active={self.active}, f_new={self.f_new}; [VER {self.VERSION}]'
+        return f'User: chat_id {self.chat_id}, nick {self.nick}, banned={self.banned}, active={self.active}, f_new={self.f_new}, tick={self.tick}; [VER {self.VERSION}]'
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
-        if VER == getattr(other, 'VERSION', 0):
+        other_version = getattr(other, 'VERSION', 0)
+        if VER == other_version:
             return other
-        print('update user')
+        print(f'Update User from {other_version} to {VER}')
         res = cls(other.chat_id)
         res.banned = getattr(other, 'banned', 0)
         res.active = getattr(other, 'active', 1)
         res.nick   = getattr(other, 'nick', gen_random_nick())
+        res.tick   = getattr(other, 'tick', 0)
         return res
+
+    def update(self):
+        self.tick += 1
+
 
 class UsersDB:
     table_name = 'users'
