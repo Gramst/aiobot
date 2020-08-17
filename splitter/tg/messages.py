@@ -46,6 +46,7 @@ class OutMessage:
     from_message_id     : int
     text                : str
     promt               : str
+    split               : str
     method              : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
@@ -55,6 +56,8 @@ class OutMessage:
         self.from_id = kwargs.get('from_id')
         self.text    = kwargs.get('text')
         self.promt   = kwargs.get('promt', '')
+        self.split   = kwargs.get('split', ' 🗣 ')
+
 
     def gen_message(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]):
         if isinstance(method, sendMessage):
@@ -64,7 +67,7 @@ class OutMessage:
             if self.file_id:
                 if self.text:
                     self.method = sendPhoto(photo   = self.file_id,
-                                            caption = self.promt + self.text)
+                                            caption = self.text)
                 else:
                     button = InlineKeyboardButton(  text = self.promt,
                                                     callback_data='asd')
@@ -85,7 +88,7 @@ class OutMessage:
         if other.message.text:
             text = other.message.text
             if self.promt:
-                text = self.promt + text
+                text = self.promt + self.split + text
             self.method  = sendMessage(text)
         if other.message.photo:
             button = InlineKeyboardButton(  text = self.promt,
@@ -99,9 +102,6 @@ class OutMessage:
         if other.message.voice:
             self.method = sendVoice(other.message.voice.file_id,
                                     caption = other.message.voice.file_id)
-        # if other.message.sticker:
-        #     self.method  = sendMessage
-        #     self.file_id = other.message.sticker.file_id
 
     async def get_reply_block(self):
         if self.reply_to_message_id:
