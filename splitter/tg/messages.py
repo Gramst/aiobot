@@ -37,6 +37,8 @@ class ResponseMessage:
         self.ok = income_json.get('ok', False)
         if self.ok:
             self.result = Message.make_from_data(income_json.get('result'))
+        else:
+            print(f'message not ok\ndict {income_json}')
 
 class OutMessage:
     base_url            : str
