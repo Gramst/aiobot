@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import sqlite3
 import aiosqlite
 import os
@@ -8,28 +8,25 @@ from typing import List
 
 from .mix_db import gen_random_nick
 
-VER = 8
+VER = 9
 
-class User:
-    chat_id : int
-    banned  : int
-    active  : int
-    f_new   : bool
-    nick    : str
-    tick    : int
-    
+@dataclass
+class UserData:
+    chat_id  : int
+    banned   : int  = 0
+    active   : int  = 1
+    f_new    : bool = True
+    nick     : str  = field(init=False)
+    tick     : int  = 0
+    f_ch_nick: bool = False
+
+    def __post__init__(self):
+        self.nick    = gen_random_nick()
+
+class User(UserData):
     
     def __init__(self, chat_id):
-        self.VERSION = VER
-        self.chat_id = chat_id
-        self.banned  = 0
-        self.active  = 1
-        self.f_new   = True
-        self.nick    = gen_random_nick()
-        self.tick    = 0
-
-    def __repr__(self):
-        return f'User: chat_id {self.chat_id}, nick {self.nick}, banned={self.banned}, active={self.active}, f_new={self.f_new}, tick={self.tick}; [VER {self.VERSION}]'
+        super().__init__(chat_id)
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
