@@ -2,11 +2,22 @@ from aiohttp import web
 import asyncio 
 from datetime import datetime
 from typing import List
+from functools import wraps
 
 from .tg import InMessage, OutMessage, ResponseMessage, Menu
-from .tg.telegramclasses.t_methods import answerCallbackQuery, sendMessage
+from .tg.telegramclasses.t_methods import answerCallbackQuery
 from .database import ReplyChain, User, UsersDB
 from .jobs import Job
+
+@dataclass
+class IterationData:
+    master : User
+    slave  : User
+    users  : List[User]
+    in_msg : InMessage
+    out_msg: OutMessage
+    out_que: asyncio.Queue
+    base_url: str
 
 class Splitter:
     clean_messages_older: int = 86400
@@ -14,18 +25,17 @@ class Splitter:
     jobs                : List[Job]
     users_list          : List[User]
     menu_list           : List[Menu]
-    actions             : list
 
     def __init__(self, token: str, bases_path: str):
-        self.jobs = []
-        self.token = token
-        self.in_queue = asyncio.Queue()
+        self.jobs    = []
+        self.token   = token
+        self.in_queue  = asyncio.Queue()
         self.out_queue = asyncio.Queue()
         self.user_database = UsersDB(bases_path, 'reply.db')
-        self.users_list = self.user_database.get_active()
+        self.users_list  = self.user_database.get_active()
         self.out_message = OutMessage
         self.message_database = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
-        self.out_message.db = self.message_database
+        self.out_message.db   = self.message_database
         self.base_url = f'https://api.telegram.org/bot{self.token}/'
         self.out_message.base_url = self.base_url
         self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
@@ -58,30 +68,13 @@ class Splitter:
             master = await self.get_master_user(income)
             slave  = await self.get_slave_user(income)
             print(master, '\n',  slave)
-
-            if income.callback:
-                await answerCallbackQuery(income.callback.id, 'Oh, you touch my talala').do_request(self.base_url, 0)
-
-            if master and not income.callback:
-                if income.message.text:
-                    if income.message.text == '/echo':
-                        master.f_echo = not master.f_echo
-                        out = self.out_message(promt='service', text=f' echo set to {master.f_echo}')
-                        out.as_text()
-                        out.set_destination([master.chat_id])
-                        self.out_queue.put_nowait(out)
-
-                out = self.out_message()
-                out.promt = master.nick
-                out << income
-                await out.get_reply_block()
-                dest = []
-                if master.f_echo:
-                    dest = [i.chat_id for i in self.users_list]
-                else:
-                    dest = [i.chat_id for i in self.users_list if i.chat_id != master.chat_id]
-                out.set_destination(dest)
-                self.out_queue.put_nowait(out)
+            iteration_data = IterationData(master, slave, self.users_list, income, self.out_message, self.out_queue, self.base_url)
+            try:
+                res = await self.bot_logic(iteration_data)
+            except Exception as e:
+                print(e)
+                res = False
+            if res:
                 await self.user_database.update_data(master)
                 if slave:
                     await self.user_database.update_data(slave)

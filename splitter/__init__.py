@@ -1,1 +1,1 @@
-from .splitter_cls import Splitter
+from .splitter_cls import Splitter, IterationData

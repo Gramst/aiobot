@@ -22,14 +22,7 @@ class Menu:
     master     : User
     pages      : List[Page]
 
-    def __init__(self, master):
+    def __init__(self, master: 'User', slave: 'User' = None):
         self.menu_id = generate(size=8)
         self.master  = master
         self.state   = 'main'
-#
-#    def main_page(self):
-#        pg = [i for i in self.pages if i.page_name = 'main']
-#        if pg:
-#            pg = pg.pop()
-#
-#        msg = pg.gen_msg()
