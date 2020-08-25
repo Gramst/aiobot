@@ -69,7 +69,7 @@ class Splitter:
                         out = self.out_message()
                         out.promt = '<service>'
                         out.text  = f'echo set to {master.f_echo}'
-                        out.method = sendMessage
+                        out.gen_message(sendMessage)
                         out.set_destination([master.chat_id])
                         self.out_queue.put_nowait(out)
 
@@ -78,7 +78,7 @@ class Splitter:
                 out << income
                 await out.get_reply_block()
                 dest = []
-                if master.f_echo:
+                if not master.f_echo:
                     dest = [i.chat_id for i in self.users_list]
                 else:
                     dest = [i.chat_id for i in self.users_list if i.chat_id != master.chat_id]
