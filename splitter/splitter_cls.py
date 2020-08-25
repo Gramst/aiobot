@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List
 
 from .tg import InMessage, OutMessage, ResponseMessage, Menu
-from .tg.telegramclasses.t_methods import answerCallbackQuery
+from .tg.telegramclasses.t_methods import answerCallbackQuery, sendMessage
 from .database import ReplyChain, User, UsersDB
 from .jobs import Job
 
@@ -14,6 +14,7 @@ class Splitter:
     jobs                : List[Job]
     users_list          : List[User]
     menu_list           : List[Menu]
+    actions             : list
 
     def __init__(self, token: str, bases_path: str):
         self.jobs = []
@@ -53,7 +54,7 @@ class Splitter:
 
     async def process(self):
         while True:
-            income = await self.in_queue.get()
+            income: InMessage = await self.in_queue.get()
             master = await self.get_master_user(income)
             slave  = await self.get_slave_user(income)
             print(master, '\n',  slave)
@@ -62,11 +63,26 @@ class Splitter:
                 await answerCallbackQuery(income.callback.id, 'Oh, you touch my talala').do_request(self.base_url, 0)
 
             if master and not income.callback:
+                if income.message.text:
+                    if income.message.text == '/echo':
+                        master.f_echo = not master.f_echo
+                        out = self.out_message()
+                        out.promt = '<service>'
+                        out.text  = f'echo set to {master.f_echo}'
+                        out.method = sendMessage
+                        out.set_destination([master.chat_id])
+                        self.out_queue.put_nowait(out)
+
                 out = self.out_message()
                 out.promt = master.nick
                 out << income
                 await out.get_reply_block()
-                out.set_destination([i.chat_id for i in self.users_list]) # if i.chat_id != master.chat_id]
+                dest = []
+                if master.f_echo:
+                    dest = [i.chat_id for i in self.users_list]
+                else:
+                    dest = [i.chat_id for i in self.users_list if i.chat_id != master.chat_id]
+                out.set_destination(dest)
                 self.out_queue.put_nowait(out)
                 await self.user_database.update_data(master)
                 if slave:

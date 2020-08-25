@@ -8,7 +8,7 @@ from typing import List
 
 from .mix_db import gen_random_nick
 
-VER = 9
+VER = 10
 
 @dataclass
 class UserData:
@@ -19,6 +19,7 @@ class UserData:
     nick     : str  = field(init=False)
     tick     : int  = 0
     f_ch_nick: bool = False
+    f_echo   : bool = False
 
     def __post__init__(self):
         self.nick    = gen_random_nick()

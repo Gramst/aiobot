@@ -57,3 +57,7 @@ class answerCallbackQuery(AIODoRequest):
     show_alert        : bool = False
     url               : str = ''
     cache_time        : int = 0
+
+#@dataclass
+#class sendChatAction(AIODoRequest):
+#    action: Union['typing', 'upload_photo', 'record_video', 'upload_video', 'record_audio', 'upload_audio', for audio files, upload_document for general files, find_location for location data, record_video_note or upload_video_note for video notes.]
