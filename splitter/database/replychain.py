@@ -42,7 +42,7 @@ class ReplyChain:
             if _:
                 sql = f"SELECT * FROM {self.table_name} WHERE fromMID=?"
                 async with db.execute(sql, [(_[1])]) as cursor:
-                    res = await cursor.fetchmany()
+                    res = await cursor.fetchall()
         return res
 
     async def get_id_from_reply(self, reply_to_message_id: int) -> int:

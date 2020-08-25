@@ -6,7 +6,7 @@ from .messages  import OutMessage
 
 class MenuButton:
     legend: str
-    action
+#    action
 
 class Page:
     page_name: str
@@ -26,10 +26,10 @@ class Menu:
         self.menu_id = generate(size=8)
         self.master  = master
         self.state   = 'main'
-
-    def main_page(self):
-        pg = [i for i in self.pages if i.page_name = 'main']
-        if pg:
-            pg = pg.pop()
-
-        msg = pg.gen_msg()
+#
+#    def main_page(self):
+#        pg = [i for i in self.pages if i.page_name = 'main']
+#        if pg:
+#            pg = pg.pop()
+#
+#        msg = pg.gen_msg()

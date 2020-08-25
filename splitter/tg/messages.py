@@ -106,8 +106,10 @@ class OutMessage:
                                     caption = other.message.voice.file_id)
 
     async def get_reply_block(self):
+        print(f'reply to {self.reply_to_message_id}')
         if self.reply_to_message_id:
             self.reply_messages_ids = await self.db.get_reply(self.reply_to_message_id)
+        print(f'replys {self.reply_messages_ids}')
 
     def _get_message_id_for_reply(self, chat_id: int) -> int:
         if self.reply_messages_ids:
@@ -128,6 +130,7 @@ class OutMessage:
             self.method.reply_to_message_id = self._get_message_id_for_reply(chat_id)
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
         if res.ok and (self.from_id and self.from_message_id):
+            print(f'adding data to reply {self.from_id} {res.result.message_id}')
             await self.db.add_data(
                     self.from_id,
                     self.from_message_id,
