@@ -61,24 +61,9 @@ class OutMessage:
         self.split   = kwargs.get('split', ' 🗣 ')
 
 
-    def gen_message(self, method: Union[sendMessage, sendPhoto, sendAudio, sendVoice]) -> None:
-        if isinstance(method, sendMessage):
-            if self.text:
-                self.method = sendMessage(text = self.promt + self.text)
-        if isinstance(method, sendPhoto):
-            if self.file_id:
-                if self.text:
-                    self.method = sendPhoto(photo   = self.file_id,
-                                            caption = self.text)
-                else:
-                    button = InlineKeyboardButton(  text = self.promt,
-                                                    callback_data='asd')
-                    self.method = sendPhoto(photo        = self.file_id,
-                                            reply_markup = InlineKeyboardMarkup(inline_keyboard = [button]))
-        if isinstance(method, sendVoice):
-            if self.file_id:
-                self.method = sendVoice(voice = self.file_id)
-
+    def as_text(self) -> None:
+        if self.text:
+            self.method = sendMessage(self.promt + self.text)
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
