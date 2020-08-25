@@ -30,3 +30,5 @@ async def process_message(data: IterationData) -> bool:
         out.set_destination(dest)
         data.out_que.put_nowait(out)
         return True
+
+    return False

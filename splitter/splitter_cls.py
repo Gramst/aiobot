@@ -3,6 +3,7 @@ import asyncio
 from datetime import datetime
 from typing import List
 from functools import wraps
+from dataclasses import dataclass
 
 from .tg import InMessage, OutMessage, ResponseMessage, Menu
 from .tg.telegramclasses.t_methods import answerCallbackQuery
