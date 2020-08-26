@@ -31,11 +31,11 @@ class FormatHTML:
         return text
 
 class OutText(FormatHTML):
-    __null_value: str
-    tags        : list
+    original_value: str
+    tags          : list
 
     def __init__(self):
-        self.__null_value = ''
+        self.original_value = ''
         self.tags = []
 
     def as_bold(self) -> None:
@@ -54,17 +54,17 @@ class OutText(FormatHTML):
         self.tags.append(self.CODE)
 
     def __repr__(self):
-        res = self.__null_value
+        res = self.replace_s(self.original_value)
         for i in self.tags:
             res = self.add_tag(res, i)
         return res
 
     def __lshift__(self, other: str):
         if isinstance(other, str):
-            self.__null_value = self.replace_s(other)
+            self.original_value = other
         else:
             try:
-                self.__null_value = self.replace_s(str(other))
+                self.original_value = str(other)
             except Exception as e:
                 print(e)
 
@@ -165,7 +165,7 @@ class OutMessage(FormatHTML):
                 text = self.promt + self.split + self.text
             self.method  = sendMessage(text)
         if other.message.photo:
-            button = InlineKeyboardButton(  text = self.promt,
+            button = InlineKeyboardButton(  text = self.promt_obj.original_value,
                                             callback_data='asd')
             self.method = sendPhoto(other.message.photo[0].file_id,
                                     caption = other.message.caption,
