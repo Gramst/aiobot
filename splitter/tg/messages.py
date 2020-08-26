@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List, Union
 import asyncio
+from time import time
 
 from .telegramclasses.t_messages import Message, CallbackQuery
 from .telegramclasses.t_methods import sendMessage, sendPhoto, sendAudio, sendVoice
@@ -105,8 +106,8 @@ class OutMessage(FormatHTML):
     base_url            : str
     db                  : ReplyChain
     file_id             : str
-    from_id             : int
-    from_message_id     : int
+    from_id             : int = None
+    from_message_id     : int = None
     text_obj            : OutText
     promt_obj           : OutText
     split_obj           : OutText
@@ -194,15 +195,17 @@ class OutMessage(FormatHTML):
         self.destinations = dest
 
     async def send_to_server(self):
+        if self.from_id and self.from_message_id:
+            await self.db.add_data(self.from_id, self.from_message_id, self.from_id, self.from_message_id, int(time()))
         _ = [self._send_to_server(i) for i in self.destinations]
         await asyncio.wait(_)
 
     async def _send_to_server(self, chat_id: int):
         if self.reply_messages_ids:
-            self.method.reply_to_message_id = self._get_message_id_for_reply(chat_id)
+            self.method.reply_to_message_id = str(self._get_message_id_for_reply(chat_id))
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
         if res.ok and (self.from_id and self.from_message_id):
-            print(f'adding data to reply {self.from_id} {res.result.message_id}')
+            print(f'adding data to reply {self.from_id} {self.from_message_id} {res.result.chat.id} {res.result.message_id}')
             await self.db.add_data(
                     self.from_id,
                     self.from_message_id,
@@ -210,3 +213,4 @@ class OutMessage(FormatHTML):
                     res.result.message_id,
                     res.result.date
                     )
+        return

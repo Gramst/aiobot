@@ -19,7 +19,8 @@ class AIODoRequest(DataToSerialise):
         data = self.get_data()
         if chat_id:
             data['chat_id'] = chat_id
-            print(f'send to {chat_id}')
+            reply_val = data.get('reply_to_message_id')
+            print(f'send to {chat_id} reply to {reply_val}')
         async with ClientSession() as session:
             async with session.post(base_url + self.__class__.__name__,
                                     data=json.dumps(data),
