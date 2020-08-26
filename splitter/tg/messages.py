@@ -15,10 +15,10 @@ class FormatHTML:
     STRIKETHROUGHT: str = 's'
     CODE          : str = 'code'
 
-    def prepare_tag_text(self, text: str, tagsymbol: str = None) -> str:
+    def add_tag(self, text: str, tagsymbol: str = None) -> str:
         if not tagsymbol:
-            return self.replace_s(text)
-        return f'<{tagsymbol}>' + self.replace_s(text) + f'</{tagsymbol}>'
+            return text
+        return f'<{tagsymbol}>' + text + f'</{tagsymbol}>'
 
     def replace_s(self, text:str) -> str:
         dict_to_replace = {
@@ -29,6 +29,32 @@ class FormatHTML:
         for i in dict_to_replace:
             text = text.replace(i, dict_to_replace[i])
         return text
+
+class OutText(FormatHTML):
+    __null_value: str
+    tags        : list
+
+    def as_bold(self) -> None:
+        self.tags.append(self.BOLD)
+
+    def as_italic(self) -> None:
+        self.tags.append(self.ITALIC)
+
+    def __repr__(self):
+        res = self.__null_value
+        for i in self.tags:
+            res = self.add_tag(res, i)
+        return res
+
+    def __lshift__(self, other: str):
+        if isinstance(other, str):
+            self.__null_value = self.replace_s(other)
+        else:
+            try:
+                self.__null_value = self.replace_s(str(other))
+            except Exception as e:
+                print(e)
+
 
 class InMessage:
     message : Message       = None
@@ -68,9 +94,9 @@ class OutMessage(FormatHTML):
     file_id             : str
     from_id             : int
     from_message_id     : int
-    text                : str
-    promt               : str
-    split               : str
+    _text               : OutText
+    _promt              : OutText
+    _split              : OutText
     method              : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
@@ -82,10 +108,33 @@ class OutMessage(FormatHTML):
         self.promt   = kwargs.get('promt', '')
         self.split   = kwargs.get('split', ' 🗣 ')
 
+    @property
+    def text(self):
+        return f'{self._text}'
+
+    @text.setter
+    def text(self, value: str):
+        self._text << value
+
+    @property
+    def promt(self):
+        return f'{self._promt}'
+
+    @promt.setter
+    def promt(self, value: str):
+        self._promt << value
+
+    @property
+    def split(self):
+        return f'{self._split}'
+
+    @split.setter
+    def split(self, value: str):
+        self._split << value
 
     def as_text(self) -> None:
         if self.text:
-            self.method = sendMessage(self.prepare_tag_text(self.promt + self.text, self.ITALIC))
+            self.method = sendMessage(self.promt + self.text)
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
@@ -97,7 +146,7 @@ class OutMessage(FormatHTML):
         if other.message.text:
             text = other.message.text
             if self.promt:
-                text = self.prepare_tag_text(self.promt + self.split + text, self.BOLD)
+                text = self.promt + self.split + text
             self.method  = sendMessage(text)
         if other.message.photo:
             button = InlineKeyboardButton(  text = self.promt,
