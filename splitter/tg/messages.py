@@ -17,28 +17,12 @@ class FormatHTML:
 
     def prepare_tag_text(self, text: str, tagsymbol: str = None) -> str:
         if not tagsymbol:
-            return self.part_replace_s(text)
-        text = f'<{tagsymbol}>' + self.full_replace_s(text) + f'</{tagsymbol}>'
-        return text
+            return self.replace_s(text)
+        return f'<{tagsymbol}>' + self.replace_s(text) + f'</{tagsymbol}>'
 
-    def full_replace_s(self, text:str) -> str:
+    def replace_s(self, text:str) -> str:
         dict_to_replace = {
-            '%' : '%25',
-            '&' : '%26',
-            '#' : '%23',
-            '+' : '%2b',
-            '@' : '%40',
-            '$' : '%24',
-            '^' : '%5e',
-            '<' : '&lt;',
-            '>' : '&gt;',
-        }
-        for i in dict_to_replace:
-            text = text.replace(i, dict_to_replace[i])
-        return text
-
-    def part_replace_s(self, text:str) -> str:
-        dict_to_replace = {
+            '&' : '&amp;',
             '<' : '&lt;',
             '>' : '&gt;',
         }
