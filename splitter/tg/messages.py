@@ -15,19 +15,30 @@ class FormatHTML:
     STRIKETHROUGHT: str = 's'
     CODE          : str = 'code'
 
-    def make_taged(self, text: str, tagsymbol: str) -> str:
-        text = f'<{tagsymbol}>' + text + f'</{tagsymbol}>'
+    def prepare_tag_text(self, text: str, tagsymbol: str = None) -> str:
+        if not tagsymbol:
+            return self.part_replace_s(text)
+        text = f'<{tagsymbol}>' + self.full_replace_s(text) + f'</{tagsymbol}>'
         return text
 
-    def _replace_symbols(self, text:str) -> str:
+    def full_replace_s(self, text:str) -> str:
         dict_to_replace = {
-            #'%' : '%25',
-            #'&' : '%26',
-            #'#' : '%23',
-            #'+' : '%2b',
-            #'@' : '%40',
-            #'$' : '%24',
-            #'^' : '%5e',
+            '%' : '%25',
+            '&' : '%26',
+            '#' : '%23',
+            '+' : '%2b',
+            '@' : '%40',
+            '$' : '%24',
+            '^' : '%5e',
+            '<' : '&lt;',
+            '>' : '&gt;',
+        }
+        for i in dict_to_replace:
+            text = text.replace(i, dict_to_replace[i])
+        return text
+
+    def part_replace_s(self, text:str) -> str:
+        dict_to_replace = {
             '<' : '&lt;',
             '>' : '&gt;',
         }
@@ -90,7 +101,7 @@ class OutMessage(FormatHTML):
 
     def as_text(self) -> None:
         if self.text:
-            self.method = sendMessage(self._replace_symbols(self.promt + self.text))
+            self.method = sendMessage(self.prepare_tag_text(self.promt + self.text, self.ITALIC))
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
@@ -102,7 +113,7 @@ class OutMessage(FormatHTML):
         if other.message.text:
             text = other.message.text
             if self.promt:
-                text = self._replace_symbols(self.promt + self.split + text)
+                text = self.prepare_tag_text(self.promt + self.split + text, self.BOLD)
             self.method  = sendMessage(text)
         if other.message.photo:
             button = InlineKeyboardButton(  text = self.promt,
