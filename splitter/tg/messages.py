@@ -8,6 +8,33 @@ from .telegramclasses.t_messages import InlineKeyboardMarkup, InlineKeyboardButt
 
 from ..database import ReplyChain
 
+class FormatHTML:
+    BOLD          : str = 'b'
+    ITALIC        : str = 'i'
+    UNDERLINE     : str = 'u'
+    STRIKETHROUGHT: str = 's'
+    CODE          : str = 'code'
+
+    def make_taged(self, text: str, tagsymbol: str) -> str:
+        text = f'<{tagsymbol}>' + text + f'</{tagsymbol}>'
+        return text
+
+    def _replace_symbols(self, text:str) -> str:
+        dict_to_replace = {
+            '%' : '%25',
+            '<' : '&lt;',
+            '>' : '&gt;',
+            '&' : '%26',
+            '#' : '%23',
+            '+' : '%2b',
+            '@' : '%40',
+            '$' : '%24',
+            '^' : '%5e',         
+        }
+        for i in dict_to_replace:
+            text = text.replace(i, dict_to_replace[i])
+        return text
+
 class InMessage:
     message : Message       = None
     callback: CallbackQuery = None
@@ -40,7 +67,7 @@ class ResponseMessage:
         else:
             print(f'message not ok\ndict {income_json}')
 
-class OutMessage:
+class OutMessage(FormatHTML):
     base_url            : str
     db                  : ReplyChain
     file_id             : str
@@ -63,7 +90,7 @@ class OutMessage:
 
     def as_text(self) -> None:
         if self.text:
-            self.method = sendMessage(self.promt + self.text)
+            self.method = sendMessage(self._replace_symbols(self.promt + self.text))
 
     def __lshift__(self, other: InMessage) -> None:
         if not isinstance(other, InMessage):
