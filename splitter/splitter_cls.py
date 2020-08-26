@@ -20,6 +20,10 @@ class IterationData:
     out_que: asyncio.Queue
     base_url: str
 
+    def get_out_msg(self, *args, **kwargs) -> OutMessage:
+        return self.out_msg(*args, **kwargs)
+
+
 class Splitter:
     clean_messages_older: int = 86400
     tic_delay           : int = 5

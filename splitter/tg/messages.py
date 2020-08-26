@@ -44,6 +44,15 @@ class OutText(FormatHTML):
     def as_italic(self) -> None:
         self.tags.append(self.ITALIC)
 
+    def as_underline(self) -> None:
+        self.tags.append(self.UNDERLINE)
+
+    def as_strikethrought(self) -> None:
+        self.tags.append(self.STRIKETHROUGHT)
+
+    def as_code(self) -> None:
+        self.tags.append(self.CODE)
+
     def __repr__(self):
         res = self.__null_value
         for i in self.tags:
@@ -98,46 +107,46 @@ class OutMessage(FormatHTML):
     file_id             : str
     from_id             : int
     from_message_id     : int
-    _text               : OutText
-    _promt              : OutText
-    _split              : OutText
+    text_obj            : OutText
+    promt_obj           : OutText
+    split_obj           : OutText
     method              : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
 
     def __init__(self, **kwargs):
-        self._text = OutText()
-        self._promt= OutText()
-        self._split= OutText()
-        self.file_id = kwargs.get('file_id')
-        self.from_id = kwargs.get('from_id')
-        self.text    = kwargs.get('text')
-        self.promt   = kwargs.get('promt', '')
-        self.split   = kwargs.get('split', ' 🗣 ')
+        self.text_obj = OutText()
+        self.promt_obj= OutText()
+        self.split_obj= OutText()
+        self.file_id  = kwargs.get('file_id')
+        self.from_id  = kwargs.get('from_id')
+        self.text     = kwargs.get('text')
+        self.promt    = kwargs.get('promt', '')
+        self.split    = kwargs.get('split', ' 🗣 ')
 
     @property
     def text(self):
-        return f'{self._text}'
+        return f'{self.text_obj}'
 
     @text.setter
     def text(self, value: str):
-        self._text << value
+        self.text_obj << value
 
     @property
     def promt(self):
-        return f'{self._promt}'
+        return f'{self.promt_obj}'
 
     @promt.setter
     def promt(self, value: str):
-        self._promt << value
+        self.promt_obj << value
 
     @property
     def split(self):
-        return f'{self._split}'
+        return f'{self.split_obj}'
 
     @split.setter
     def split(self, value: str):
-        self._split << value
+        self.split_obj << value
 
     def as_text(self) -> None:
         if self.text:
