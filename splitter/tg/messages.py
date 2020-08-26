@@ -34,6 +34,10 @@ class OutText(FormatHTML):
     __null_value: str
     tags        : list
 
+    def __init__(self):
+        self.__null_value = ''
+        self.tags = []
+
     def as_bold(self) -> None:
         self.tags.append(self.BOLD)
 
@@ -94,9 +98,9 @@ class OutMessage(FormatHTML):
     file_id             : str
     from_id             : int
     from_message_id     : int
-    _text               : OutText
-    _promt              : OutText
-    _split              : OutText
+    _text               : OutText = OutText()
+    _promt              : OutText = OutText()
+    _split              : OutText = OutText()
     method              : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
