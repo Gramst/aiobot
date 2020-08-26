@@ -13,7 +13,8 @@ async def process_message(data: IterationData) -> bool:
             if data.in_msg.message.text == '/echo':
                 data.master.f_echo = not data.master.f_echo
                 out = data.out_msg(promt='<service> ::', text=f' echo set to {data.master.f_echo}')
-                out.promt
+                out._promt.as_bold()
+                out._promt.as_italic()
                 out.as_text()
                 out.set_destination([data.master.chat_id])
                 data.out_que.put_nowait(out)
@@ -21,8 +22,9 @@ async def process_message(data: IterationData) -> bool:
 
         out = data.out_msg()
         out.promt = data.master.nick
+        out._promt.as_bold()
+        out._text.as_italic()
         out << data.in_msg
-        out.promt
         await out.get_reply_block()
         dest = []
         if data.master.f_echo:

@@ -98,14 +98,17 @@ class OutMessage(FormatHTML):
     file_id             : str
     from_id             : int
     from_message_id     : int
-    _text               : OutText = OutText()
-    _promt              : OutText = OutText()
-    _split              : OutText = OutText()
+    _text               : OutText
+    _promt              : OutText
+    _split              : OutText
     method              : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
 
     def __init__(self, **kwargs):
+        self._text = OutText()
+        self._promt= OutText()
+        self._split= OutText()
         self.file_id = kwargs.get('file_id')
         self.from_id = kwargs.get('from_id')
         self.text    = kwargs.get('text')
@@ -148,9 +151,9 @@ class OutMessage(FormatHTML):
         if other.message.reply_to_message:
             self.reply_to_message_id = other.message.reply_to_message.message_id
         if other.message.text:
-            text = other.message.text
+            self.text = other.message.text
             if self.promt:
-                text = self.promt + self.split + text
+                text = self.promt + self.split + self.text
             self.method  = sendMessage(text)
         if other.message.photo:
             button = InlineKeyboardButton(  text = self.promt,
