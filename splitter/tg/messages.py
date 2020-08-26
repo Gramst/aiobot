@@ -21,15 +21,15 @@ class FormatHTML:
 
     def _replace_symbols(self, text:str) -> str:
         dict_to_replace = {
-            '%' : '%25',
+            #'%' : '%25',
+            #'&' : '%26',
+            #'#' : '%23',
+            #'+' : '%2b',
+            #'@' : '%40',
+            #'$' : '%24',
+            #'^' : '%5e',
             '<' : '&lt;',
             '>' : '&gt;',
-            '&' : '%26',
-            '#' : '%23',
-            '+' : '%2b',
-            '@' : '%40',
-            '$' : '%24',
-            '^' : '%5e',         
         }
         for i in dict_to_replace:
             text = text.replace(i, dict_to_replace[i])
@@ -102,7 +102,7 @@ class OutMessage(FormatHTML):
         if other.message.text:
             text = other.message.text
             if self.promt:
-                text = self.promt + self.split + text
+                text = self._replace_symbols(self.promt + self.split + text)
             self.method  = sendMessage(text)
         if other.message.photo:
             button = InlineKeyboardButton(  text = self.promt,
