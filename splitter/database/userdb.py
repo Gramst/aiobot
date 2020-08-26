@@ -20,6 +20,7 @@ class UserData:
     tick     : int  = 0
     f_ch_nick: bool = False
     f_echo   : bool = False
+    VERSION  : int  = field(init=False)
 
     def __post__init__(self):
         self.nick    = gen_random_nick()
@@ -36,11 +37,12 @@ class User(UserData):
             print('Version check OK')
             return other
         print(f'Update User from {other_version} to {VER}')
-        res = cls(other.chat_id)
-        res.banned = getattr(other, 'banned', 0)
-        res.active = getattr(other, 'active', 1)
-        res.nick   = getattr(other, 'nick', gen_random_nick())
-        res.tick   = getattr(other, 'tick', 0)
+        res         = cls(other.chat_id)
+        res.VERSION = VER
+        res.banned  = getattr(other, 'banned', 0)
+        res.active  = getattr(other, 'active', 1)
+        res.nick    = getattr(other, 'nick', gen_random_nick())
+        res.tick    = getattr(other, 'tick', 0)
         return res
 
     def update(self):
