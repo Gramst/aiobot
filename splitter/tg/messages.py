@@ -8,7 +8,7 @@ from .telegramclasses.t_methods import sendMessage, sendPhoto, sendAudio, sendVo
 from .telegramclasses.t_messages import InlineKeyboardMarkup, InlineKeyboardButton
 
 from ..database import ReplyChain
-
+from ..database import User
 class FormatHTML:
     BOLD          : str = 'b'
     ITALIC        : str = 'i'
@@ -102,7 +102,41 @@ class ResponseMessage:
         else:
             print(f'message not ok\ndict {income_json}')
 
-class OutMessage(FormatHTML):
+@dataclass
+class MessageNotificationTypes:
+    __normal: bool = True
+    __social: bool = False
+    __system: bool = False
+
+    def set_notify_to_normal(self):
+        self.__normal = True
+        self.__social = False
+        self.__system = False
+
+    def set_notify_to_social(self):
+        self.__normal = False
+        self.__social = True
+        self.__system = False
+
+    def set_notify_to_system(self):
+        self.__normal = False
+        self.__social = False
+        self.__system = True
+
+    @property
+    def notify_type_normal(self):
+        return self.__normal
+
+    @property
+    def notify_type_social(self):
+        return self.__social
+
+    @property
+    def notify_type_system(self):
+        return self.__social
+
+
+class OutMessage(FormatHTML, MessageNotificationTypes):
     base_url            : str
     db                  : ReplyChain
     file_id             : str
@@ -114,6 +148,7 @@ class OutMessage(FormatHTML):
     method              : Union[sendMessage, sendPhoto, sendAudio, sendVoice]
     reply_to_message_id : int        = None
     reply_messages_ids  : List[list] = []
+    destinations        : List[User]
 
     def __init__(self, **kwargs):
         self.text_obj = OutText()
@@ -191,18 +226,36 @@ class OutMessage(FormatHTML):
                 return _[0]
         return None
 
-    def set_destination(self, dest: List[int]):
-        self.destinations = dest
+    def add_destination(self, to_user: Union[User, int]):
+        if isinstance(to_user, User):
+            self.destinations.append(to_user)
+        elif isinstance(to_user, int):
+            self.destinations.append(User(to_user))
+
 
     async def send_to_server(self):
         if self.from_id and self.from_message_id:
             await self.db.add_data(self.from_id, self.from_message_id, self.from_id, self.from_message_id, int(time()))
-        _ = [self._send_to_server(i) for i in self.destinations]
+        _ = []
+        if self.notify_type_normal:
+            if self.reply_messages_ids:
+                for user in self.destinations:
+                    if user.chat_id != self.reply_messages_ids[0][0]:
+                        _.append(self._send_to_server(user.chat_id, user.msg_flags.normal))
+                    _.append(self._send_to_server(user.chat_id, user.msg_flags.reply))
+            else:
+                _ = [self._send_to_server(i.chat_id, i.msg_flags.normal) for i in self.destinations]
+        elif self.notify_type_social:
+            _ = [self._send_to_server(i.chat_id, i.msg_flags.social) for i in self.destinations]
+        elif self.notify_type_system:
+            _ = [self._send_to_server(i.chat_id, i.msg_flags.system) for i in self.destinations]
+        else:
+            _ = [self._send_to_server(i.chat_id) for i in self.destinations]
         await asyncio.wait(_)
 
-    async def _send_to_server(self, chat_id: int):
+    async def _send_to_server(self, chat_id: int, notification: bool = False):
         if self.reply_messages_ids:
-            self.method.reply_to_message_id = str(self._get_message_id_for_reply(chat_id))
+            self.method.reply_to_message_id = self._get_message_id_for_reply(chat_id)
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
         if res.ok and (self.from_id and self.from_message_id):
             print(f'adding data to reply {self.from_id} {self.from_message_id} {res.result.chat.id} {res.result.message_id}')
@@ -213,4 +266,3 @@ class OutMessage(FormatHTML):
                     res.result.message_id,
                     res.result.date
                     )
-        return

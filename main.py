@@ -15,7 +15,7 @@ sslcontext.load_cert_chain(CRT,keyfile=KEY)
 
 bot = Splitter(TOKEN, 'bratishkabot/')
 
-bot.bot_logic = process_message
+bot.set_bot_logic(process_message)
 
 async def init_app(loop, bot: Splitter):
     app = web.Application(loop=loop)

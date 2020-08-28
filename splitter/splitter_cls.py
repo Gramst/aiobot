@@ -46,6 +46,9 @@ class Splitter:
         self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
         self.jobs.append(Job.get_job(self._user_update, 5))
 
+    def set_bot_logic(self, logic_function):
+        self.bot_logic = logic_function
+
     async def _user_update(self):
         [i.update() for i in self.users_list if i]
 

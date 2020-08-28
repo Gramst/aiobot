@@ -11,8 +11,9 @@ async def process_message(data: IterationData) -> bool:
     if data.master and not data.in_msg.callback:
         if data.in_msg.message.text:
             if data.in_msg.message.text == '/echo':
-                data.master.f_echo = not data.master.f_echo
+                data.master.state_user.echo = not data.master.state_user.echo
                 out = data.get_out_msg(promt='<service> ::', text=f' echo set to {data.master.f_echo}')
+                out.set_notify_to_system()
                 out.promt_obj.as_bold()
                 out.promt_obj.as_italic()
                 out.as_text()
@@ -21,6 +22,7 @@ async def process_message(data: IterationData) -> bool:
                 return True
 
         out = data.get_out_msg()
+        out.set_notify_to_normal()
         out.promt = data.master.nick
         out.promt_obj.as_bold()
         out.text_obj.as_italic()

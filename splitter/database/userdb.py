@@ -8,27 +8,43 @@ from typing import List
 
 from .mix_db import gen_random_nick
 
-VER = 10
+VER = 11
+
+@dataclass
+class messageFlags:
+    normal: bool = False
+    reply : bool = True
+    social: bool = True
+    system: bool = True
+
+@dataclass
+class UserState:
+    change_nick : bool = False
+    wisp_mode   : bool = False
+    wisp_to     : int  = 0
+    blinded     : bool = False
+    muted       : bool = False
+    muted_before: int  = 0
+    echo        : bool = False 
 
 @dataclass
 class UserData:
     chat_id  : int
     banned   : int  = 0
     active   : int  = 1
-    f_new    : bool = True
     nick     : str  = field(init=False)
     tick     : int  = 0
-    f_ch_nick: bool = False
-    f_echo   : bool = False
     VERSION  : int  = field(init=False)
 
     def __post__init__(self):
-        self.nick    = gen_random_nick()
+        self.nick = gen_random_nick()
 
 class User(UserData):
     
     def __init__(self, chat_id):
         super().__init__(chat_id)
+        self.msg_flags  = messageFlags()
+        self.state_user = UserState()
 
     @classmethod
     def check_version(cls, other: 'User') -> 'User':
