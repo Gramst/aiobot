@@ -154,6 +154,7 @@ class OutMessage(FormatHTML, MessageNotificationTypes):
         self.text_obj = OutText()
         self.promt_obj= OutText()
         self.split_obj= OutText()
+        self.destinations = []
         self.file_id  = kwargs.get('file_id')
         self.from_id  = kwargs.get('from_id')
         self.text     = kwargs.get('text')
@@ -253,7 +254,9 @@ class OutMessage(FormatHTML, MessageNotificationTypes):
             _ = [self._send_to_server(i.chat_id) for i in self.destinations]
         await asyncio.wait(_)
 
-    async def _send_to_server(self, chat_id: int, notification: bool = False):
+    async def _send_to_server(self, chat_id: int, notification: bool = True):
+        if not notification:
+            self.method.disable_notification = True
         if self.reply_messages_ids:
             self.method.reply_to_message_id = self._get_message_id_for_reply(chat_id)
         res = ResponseMessage(await self.method.do_request(self.base_url, chat_id))
