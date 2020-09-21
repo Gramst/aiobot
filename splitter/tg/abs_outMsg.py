@@ -157,9 +157,41 @@ class InlineKeyboard:
     def make_key(text: str, callback_data: str = '') -> InlineKeyboardButton:
         return InlineKeyboardButton(text = text, callback_data=callback_data)
 
+class MessageInBotNotification:
+
+    def __init__(self):
+        self._regular: bool = True
+        self._social : bool = False
+        self._system : bool = False
+        self._reply  : bool = False
+
+    def set_notify_to_regular(self):
+        self._regular = True
+        self._social = False
+        self._system = False
+
+    def set_notify_to_social(self):
+        self._regular = False
+        self._social = True
+        self._system = False
+
+    def set_notify_to_system(self):
+        self._regular = False
+        self._social = False
+        self._system = True
+
+    def get_notification_flag(self, out_msg: "OutMessage", user: User):
+        if self._regular:
+            return user.msg_flags.normal
+        if self._social:
+            return user.msg_flags.social
+        if self._system:
+            return user.msg_flags.system
+
 class OutMessage:
-    master : User
-    slave  : User
+    master     : User
+    slave      : User
+    method_name: 'NoName'
 
     def __init__(self, text_handler: TextHandler):
         self.file_id             : str   = None
@@ -170,7 +202,8 @@ class OutMessage:
         self.reply               : Reply = Reply()
         self.destinations        : List[User] = []
         self.f_no_reply          : bool = False
-        self.method_name         : str  = ''
+        self.notify_msg          = MessageInBotNotification()
+        #self.method_name         : str  = ''
         self.text_handler        : TextHandler = text_handler
         self.inline_keyboard     = InlineKeyboard()
 
@@ -188,6 +221,7 @@ class TextMessage(OutMessage):
             result['text'] = self.text_handler.process(self, user)
             result['chat_id']    = user.chat_id
             result['parse_mode'] = 'html'
+            result['notification'] = self.notify_msg.get_notification_flag(self, user)
             if not self.f_no_reply:
                 result['reply_to_message_id'] = self.reply.get_message_id_for_reply(user.chat_id)
             yield result
@@ -206,9 +240,3 @@ class PhotoMessage(OutMessage):
             if not self.f_no_reply:
                 result['reply_to_message_id'] = self.reply.get_message_id_for_reply(user.chat_id)
             yield result
-
-class AbsFactoryMessages:
-
-    @staticmethod
-    def get_text_message(text_handler: TextHandler) -> TextMessage:
-        return TextMessage(text_handler)

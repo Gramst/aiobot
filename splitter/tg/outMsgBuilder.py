@@ -1,7 +1,7 @@
 from typing import List, Union, Callable
 import asyncio
 
-from .abs_outMsg import AbsFactoryMessages, OutMessage, TextHandler
+from .abs_outMsg import AbsFactoryMessages, OutMessage, TextHandler, TextMessage, PhotoMessage
 from .text_handlers import TextHandlerList
 from .income_message import InMessage
 
@@ -12,10 +12,16 @@ class DirectorOutMessages:
 
     async def make_empty_text_message(self, text_handler: TextHandler = None) -> OutMessage:
         if text_handler and isinstance(text_handler, TextHandler):
-            result = AbsFactoryMessages.get_text_message(text_handler)
+            result = TextMessage(text_handler)
         else:
-            result = AbsFactoryMessages.get_text_message(self.handlers.get_handler(self.handlers.BASE_TEXT))
-        result.method_name = 'sendMessage'
+            result = TextMessage(self.handlers.get_handler(self.handlers.BASE_TEXT))
+        return result
+
+    async def make_empty_photo_message(self, text_handler: TextHandler = None) -> OutMessage:
+        if text_handler and isinstance(text_handler, TextHandler):
+            result = PhotoMessage(text_handler)
+        else:
+            result = PhotoMessage(self.handlers.get_handler(self.handlers.BASE_PHOTO))
         return result
 
     async def make_auto_message_from_income(self):
