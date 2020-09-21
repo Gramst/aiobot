@@ -5,44 +5,49 @@ from typing import List
 from functools import wraps
 from dataclasses import dataclass
 
-from .tg import InMessage, OutMessage, ResponseMessage, Menu
+from .tg import InMessage, DirectorOutMessages, AbsFactoryMessages
 from .tg.telegramclasses.t_methods import answerCallbackQuery
 from .database import ReplyChain, User, UsersDB
 from .jobs import Job
+
+def singleton(cls):
+    instances = {}
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls()
+        return instances[cls]
+    return getinstance
 
 @dataclass
 class IterationData:
     master : User
     slave  : User
-    users  : List[User]
     in_msg : InMessage
-    out_msg: OutMessage
-    out_que: asyncio.Queue
-    base_url: str
 
-    def get_out_msg(self, *args, **kwargs) -> OutMessage:
-        return self.out_msg(*args, **kwargs)
-
-
+@singleton
 class Splitter:
     clean_messages_older: int = 86400
     tic_delay           : int = 5
     jobs                : List[Job]
     users_list          : List[User]
-    menu_list           : List[Menu]
+    #menu_list           : List[Menu]
 
-    def __init__(self, token: str, bases_path: str):
+    def __init__(self):
         self.jobs    = []
-        self.token   = token
+        self.token   = ''
         self.in_queue  = asyncio.Queue()
         self.out_queue = asyncio.Queue()
-        self.user_database = UsersDB(bases_path, 'reply.db')
-        self.users_list  = self.user_database.get_active()
-        self.out_message = OutMessage
-        self.message_database = ReplyChain(bases_path, 'reply.db', self.clean_messages_older)
-        self.out_message.db   = self.message_database
+        self.user_database = None
+        self.outMesageBilder = DirectorOutMessages()
+        self.message_database = None
+        self.base_url = None
+
+    def set(self, token: str, base_path: str):
+        self.token   = token
         self.base_url = f'https://api.telegram.org/bot{self.token}/'
-        self.out_message.base_url = self.base_url
+        self.user_database = UsersDB(base_path, 'reply.db')
+        self.users_list  = self.user_database.get_active()
+        self.message_database = ReplyChain(base_path, 'reply.db', self.clean_messages_older)
         self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
         self.jobs.append(Job.get_job(self._user_update, 5))
 
@@ -76,7 +81,7 @@ class Splitter:
             master = await self.get_master_user(income)
             slave  = await self.get_slave_user(income)
             print(master, '\n',  slave)
-            iteration_data = IterationData(master, slave, self.users_list, income, self.out_message, self.out_queue, self.base_url)
+            iteration_data = IterationData(master, slave, income)
             try:
                 res = await self.bot_logic(iteration_data)
             except Exception as e:

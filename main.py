@@ -13,7 +13,8 @@ from bot import process_message
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 sslcontext.load_cert_chain(CRT,keyfile=KEY)
 
-bot = Splitter(TOKEN, 'bratishkabot/')
+bot = Splitter()
+bot.set(TOKEN, 'bratishkabot/')
 
 bot.set_bot_logic(process_message)
 
