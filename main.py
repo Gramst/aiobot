@@ -6,19 +6,19 @@ import ssl
 
 from nonpublic import TOKEN, CRT, KEY
 
-from splitter import Splitter
+from splitter import CoreSingleton
 
 from bot import process_message
 
 sslcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 sslcontext.load_cert_chain(CRT,keyfile=KEY)
 
-bot = Splitter()
+bot = CoreSingleton()
 bot.set(TOKEN, 'bratishkabot/')
 
 bot.set_bot_logic(process_message)
 
-async def init_app(loop, bot: Splitter):
+async def init_app(loop, bot: CoreSingleton):
     app = web.Application(loop=loop)
     app.router.add_post(f'/{bot.token}', bot.income_msg)
     return app

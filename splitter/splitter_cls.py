@@ -18,19 +18,11 @@ def singleton(cls):
         return instances[cls]
     return getinstance
 
-@dataclass
-class IterationData:
-    master : User
-    slave  : User
-    in_msg : InMessage
-
 @singleton
-class Splitter:
+class CoreSingleton:
     clean_messages_older: int = 86400
     tic_delay           : int = 5
     jobs                : List[Job]
-    users_list          : List[User]
-    #menu_list           : List[Menu]
 
     def __init__(self):
         self.jobs    = []
@@ -45,8 +37,7 @@ class Splitter:
     def set(self, token: str, base_path: str):
         self.token   = token
         self.base_url = f'https://api.telegram.org/bot{self.token}/'
-        self.user_database = UsersDB(base_path, 'reply.db')
-        self.users_list  = self.user_database.get_active()
+        self.user_database = UsersDB(base_path, 'reply.db', 'users')
         self.message_database = ReplyChain(base_path, 'reply.db', self.clean_messages_older)
         self.jobs.append(Job.get_job(self.message_database.clear_old, 25))
         self.jobs.append(Job.get_job(self._user_update, 5))
@@ -55,17 +46,25 @@ class Splitter:
         self.bot_logic = logic_function
 
     async def _user_update(self):
-        [i.update() for i in self.users_list if i]
+        [i.update() for i in self.user_database.users_list if i]
 
     async def income_msg(self, request) -> InMessage:
         data = await request.json()
-        self.in_queue.put_nowait(InMessage(data))
+        income = InMessage(data)
+        if income.callback:
+            master_id = income.callback.from_u.id
+        elif income.message:
+            master_id = income.message.chat.id
+        master = await self.user_database.get_user(master_id)
+        if income.message and income.message.reply_to_message:
+            slave_id = self.message_database.get_id_from_reply(income.message.reply_to_message_id.message_id)
+            if slave_id:
+                slave = await self.user_database.get_user(slave_id)
+        print(master, '\n',  slave)
+        await self.user_database.update_user(master)
+        if slave:
+            await self.user_database.update_user(slave)
         return web.Response(status=200)
-
-    async def send_out(self):
-        while True:
-            out: OutMessage = await self.out_queue.get()
-            await out.send_to_server()
 
     async def kronos(self):
         while True:
@@ -74,51 +73,3 @@ class Splitter:
             for job in _:
                 await job.run()
             await asyncio.sleep(self.tic_delay)
-
-    async def process(self):
-        while True:
-            income: InMessage = await self.in_queue.get()
-            master = await self.get_master_user(income)
-            slave  = await self.get_slave_user(income)
-            print(master, '\n',  slave)
-            iteration_data = IterationData(master, slave, income)
-            try:
-                res = await self.bot_logic(iteration_data)
-            except Exception as e:
-                print(e)
-                res = False
-            if res:
-                await self.user_database.update_data(master)
-                if slave:
-                    await self.user_database.update_data(slave)
-
-    async def get_master_user(self, income: InMessage) -> User:
-        master = None
-        if income.message:
-            _ = [i for i in self.users_list if i.chat_id == income.message.chat.id]
-            if _:
-                master = _[0]
-            else:
-                master = await self.user_database.get_data(income.message.chat.id)                
-                if not master:
-                    master = User(income.message.chat.id)
-                    await self.user_database.add_data(master)
-                self.users_list.append(master)
-        return master
-
-    async def get_slave_user(self, income: InMessage) -> User:
-        slave = None
-        if income.message:
-            slave_id = None
-            if income.message.reply_to_message:
-                slave_id = await self.message_database.get_id_from_reply(income.message.reply_to_message.message_id)
-                print(slave_id)
-            if slave_id:
-                _ = [i for i in self.users_list if i.chat_id == slave_id]
-                if _:
-                    slave = _[0]
-                else:
-                    slave = await self.user_database.get_data(slave_id)                
-                    if not slave:
-                        return None
-        return slave

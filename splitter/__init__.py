@@ -1,1 +1,1 @@
-from .splitter_cls import Splitter, IterationData
+from .splitter_cls import CoreSingleton, IterationData

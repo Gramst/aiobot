@@ -2,7 +2,7 @@ from typing import List, Union, Callable
 
 
 from .telegramclasses.t_messages import InlineKeyboardMarkup, InlineKeyboardButton
-from .. import Splitter
+from .. import CoreSingleton
 from ..database import User
 
 class FormatHTML:
@@ -79,7 +79,7 @@ class Reply:
 
     async def set_async(self, reply_to: int) -> None:
         self.raw_reply_to = reply_to
-        db = Splitter().message_database
+        db = CoreSingleton().message_database
         if self.raw_reply_to:
             self.reply_block = await db.get_reply(self.raw_reply_to)
 
@@ -198,7 +198,6 @@ class OutMessage:
         self.from_id             : int   = None
         self.from_message_id     : int   = None
         self.text                : str   = ''
-        self.splitter            : str   = ' : '
         self.reply               : Reply = Reply()
         self.destinations        : List[User] = []
         self.f_no_reply          : bool = False
